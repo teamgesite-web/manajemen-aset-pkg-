@@ -243,30 +243,41 @@ $("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)r
   if(!add.length)return toast("Tidak ada polygon di file ini");
   addMany(add);map.fitBounds(group.getBounds());toast(add.length+" polygon diimpor")};
 
-/* Google Drive */
-function auth(){return new Promise((ok,no)=>{
-  if(!S.clientId){$("dlg").showModal();return no(new Error("Isi Client ID dulu"))}
-  if(tok&&Date.now()<tokExp)return ok();
-  if(!window.google||!google.accounts)return no(new Error("Library Google belum termuat, cek koneksi"));
-  google.accounts.oauth2.initTokenClient({client_id:S.clientId,scope:"https://www.googleapis.com/auth/drive",
-    callback:r=>{if(r.access_token){tok=r.access_token;tokExp=Date.now()+3000*1000;ok()}else no(new Error("Login Google gagal"))},
-    error_callback:()=>no(new Error("Login Google dibatalkan"))}).requestAccessToken()})}
-$("bSave").onclick=async()=>{try{await auth();const body=JSON.stringify({version:1,saved:new Date().toISOString(),pin:S.pin||"",assets});let r;
-  if(S.fileId)r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${S.fileId}?uploadType=media`,{method:"PATCH",headers:{Authorization:"Bearer "+tok,"Content-Type":"application/json"},body});
-  else{const b="b"+Date.now(),m={name:"aset-tanah.json",mimeType:"application/json"};if(S.folderId)m.parents=[S.folderId];
-    r=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{Authorization:"Bearer "+tok,"Content-Type":"multipart/related; boundary="+b},
-      body:`--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(m)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`})}
-  if(!r.ok)throw new Error("Drive menolak ("+r.status+")");
-  if(!S.fileId){S.fileId=(await r.json()).id;localStorage.setItem(LSS,JSON.stringify(S));toast("File dibuat di Drive. Bagikan file itu ke tim, lalu kirim ID-nya: "+S.fileId)}else toast("Tersimpan ke Drive")}
-  catch(e){tok=null;toast(e.message)}};
-$("bLoad").onclick=async()=>{try{if(!S.fileId){$("dlg").showModal();throw new Error("Isi ID file Drive dulu")}await auth();
-  const r=await fetch(`https://www.googleapis.com/drive/v3/files/${S.fileId}?alt=media`,{headers:{Authorization:"Bearer "+tok}});
-  if(!r.ok)throw new Error("Gagal membaca file ("+r.status+")");const d=await r.json();if(d.pin){S.pin=d.pin;localStorage.setItem(LSS,JSON.stringify(S))}
-  if(!confirm("Ganti "+assets.length+" aset di perangkat ini dengan "+(d.assets||[]).length+" aset dari Drive?"))return;
-  assets=d.assets||[];sel=null;persist();draw();render();if(assets.length)map.fitBounds(group.getBounds());toast("Data dimuat dari Drive")}catch(e){tok=null;toast(e.message)}};
-$("bSet").onclick=()=>{$("sClient").value=S.clientId;$("sFile").value=S.fileId;$("sFolder").value=S.folderId;$("dlg").showModal()};
-$("sOk").onclick=()=>{S=Object.assign(S,{clientId:$("sClient").value.trim(),fileId:$("sFile").value.trim(),folderId:$("sFolder").value.trim()});localStorage.setItem(LSS,JSON.stringify(S));tok=null;$("dlg").close();toast("Pengaturan tersimpan")};
-$("sNo").onclick=()=>$("dlg").close();
+/* Google Sheets Sinkronisasi Tim */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbby230P4cCfZHmLZgZMXgiS9S89pFNsvLcAyQdQCP-V6BYrKgefid_VIN_-bm1LhYCgn/exec";
+
+$("bLoad").onclick = async () => {
+  try {
+    toast("Mengambil data dari Google Sheets...");
+    const res = await fetch(SCRIPT_URL);
+    if (!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
+    const data = await res.json();
+    
+    assets = data || [];
+    sel = null;
+    persist();
+    draw();
+    render();
+    if (assets.length) map.fitBounds(group.getBounds(), {padding: [30, 30]});
+    toast("Data berhasil dimuat dari Google Sheets!");
+  } catch (e) {
+    toast(e.message);
+  }
+};
+
+$("bSave").onclick = async () => {
+  try {
+    toast("Menyimpan data ke Google Sheets...");
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(assets)
+    });
+    if (!res.ok) throw new Error("Gagal menyimpan data (" + res.status + ")");
+    toast("Data berhasil tersimpan ke Google Sheets!");
+  } catch (e) {
+    toast(e.message);
+  }
+};
 
 draw();setAdmin(false);if(assets.length)map.fitBounds(group.getBounds(),{padding:[30,30]});
 </script>
