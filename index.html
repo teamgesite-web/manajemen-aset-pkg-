@@ -2249,6 +2249,26 @@
     });
   }
 }
+
+// Mendengarkan perubahan data dari Firebase secara real-time
+firebase.database().ref("peta_aset").on('value', (snapshot) => {
+  const dataFromServer = snapshot.val();
+  if (dataFromServer) {
+    // Ubah data object dari server kembali menjadi array untuk aplikasi GIS
+    assets = Object.values(dataFromServer);
+    
+    // Simpan ke storage lokal agar tetap aman
+    saveAssetsToStorage();
+    
+    // Perbarui tampilan peta/tabel di layar secara otomatis
+    if (typeof renderAll === 'function') {
+      renderAll();
+    }
+    
+    console.log("Data berhasil disinkronkan secara real-time dari Firebase!");
+  }
+});
 </script>
 </body>
+<div id="firebase-status" style="position: fixed; bottom: 10px; right: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
 </html>
