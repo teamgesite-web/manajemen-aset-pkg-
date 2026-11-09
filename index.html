@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peta Aset Tanah</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{--ink:#16231f;--mute:#5d6b66;--pane:#f4f6f5;--line:#d5ddd9;--acc:#1f6f5c;--acc2:#17574a;--bad:#c4372c;--white:#fff}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:var(--ink);display:grid;grid-template-columns:380px 1fr;grid-template-rows:auto 1fr}
+header{grid-column:1/3;background:var(--ink);color:#fff;display:flex;gap:8px;align-items:center;padding:8px 14px;flex-wrap:wrap}
+header h1{font-size:16px;font-weight:600;margin:0 auto 0 0}
+button,.btn{font:inherit;border:1px solid var(--line);background:var(--white);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+header button{background:transparent;color:#fff;border-color:#4b5f58}
+header button:hover{background:#24372f}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.primary:hover{background:var(--acc2)}
+button.danger{color:var(--bad);border-color:#e3b5b0}
+aside{background:var(--pane);border-right:1px solid var(--line);overflow:auto;padding:12px;min-height:0}
+#map{min-height:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.stats div{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:8px}
+.stats b{display:block;font-size:18px}
+.stats span{color:var(--mute);font-size:12px}
+.tools{display:flex;gap:6px;margin-bottom:10px}
+.tools input,.tools select,label input,label select,label textarea{font:inherit;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--white)}
+.item{display:flex;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:6px;padding:9px 10px;margin-bottom:6px;cursor:pointer;text-align:left;width:100%}
+.item:hover{border-color:var(--acc)}
+.dot{width:10px;border-radius:3px;flex:none}
+.item small{color:var(--mute);display:block}
+.empty{color:var(--mute);padding:18px 4px}
+label{display:block;margin-bottom:9px;font-weight:500}
+label span{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;font-weight:400}
+textarea{min-height:70px;resize:vertical}
+.area{background:var(--ink);color:#fff;border-radius:6px;padding:10px 12px;margin-bottom:12px}
+.area b{font-size:20px}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+dialog{border:1px solid var(--line);border-radius:10px;max-width:460px;width:92%;padding:18px}
+dialog::backdrop{background:rgba(22,35,31,.45)}
+dialog p{color:var(--mute);margin:0 0 10px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 14px;border-radius:6px;z-index:2000;display:none}
+#dAdd{max-width:560px}
+#addForm{max-height:58vh;overflow:auto;padding-right:4px}
+textarea.coords{font-family:ui-monospace,Menlo,monospace;font-size:13px;min-height:120px;white-space:pre}
+input:disabled,select:disabled,textarea:disabled{background:#eceff0;color:var(--ink);opacity:1}
+.note{color:var(--mute);margin:-4px 0 10px;font-size:13px}
+@media(max-width:800px){body{grid-template-columns:1fr;grid-template-rows:auto 45vh 1fr}header{grid-column:1}#map{order:1}aside{order:2;border-right:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Peta Aset Tanah</h1>
+  <button id="bAdmin">Masuk admin</button>
+  <button id="bAdd" class="adm primary" hidden>+ Tambah aset</button>
+  <button id="bLoad">Ambil dari Drive</button>
+  <button id="bSave" class="adm" hidden>Simpan ke Drive</button>
+  <button id="bKml">Ekspor KML (Google Earth)</button>
+  <button id="bGeo">Ekspor GeoJSON</button>
+  <button id="bCsv">Ekspor CSV</button>
+  <button id="bImp" class="adm" hidden>Impor KML/GeoJSON</button>
+  <button id="bSet">Pengaturan Drive</button>
+  <input type="file" id="file" accept=".kml,.geojson,.json" hidden>
+</header>
+<aside id="side"></aside>
+<div id="map"></div>
+
+<dialog id="dlg">
+  <h3 style="margin-top:0">Pengaturan Google Drive</h3>
+  <p>Masukkan OAuth Client ID dari Google Cloud Console (tipe Web application, tambahkan alamat situs ini ke Authorized JavaScript origins, aktifkan Google Drive API).</p>
+  <label><span>OAuth Client ID</span><input id="sClient" placeholder="xxxx.apps.googleusercontent.com"></label>
+  <label><span>ID file data di Drive (kosong = dibuat otomatis saat simpan pertama)</span><input id="sFile"></label>
+  <label><span>ID folder Drive tujuan (opsional)</span><input id="sFolder"></label>
+  <div class="row"><button class="primary" id="sOk">Simpan pengaturan</button><button id="sNo">Tutup</button></div>
+</dialog>
+<dialog id="dPin">
+  <h3 id="pTitle" style="margin-top:0"></h3><p id="pHelp"></p>
+  <label><span>PIN</span><input id="pIn" type="password" inputmode="numeric" autocomplete="off"></label>
+  <label id="pCw" hidden><span>Ulangi PIN</span><input id="pIn2" type="password" inputmode="numeric" autocomplete="off"></label>
+  <p id="pErr" style="color:var(--bad);margin:0 0 8px"></p>
+  <div class="row"><button class="primary" id="pOk">Lanjut</button><button id="pNo">Batal</button></div>
+</dialog>
+<dialog id="dAdd">
+  <h3 style="margin-top:0">Tambah aset tanah</h3>
+  <div id="addForm"></div>
+  <p id="aErr" style="color:var(--bad);margin:0 0 8px"></p>
+  <div class="row"><button class="primary" id="aOk">Simpan aset</button><button id="aNo">Batal</button></div>
+</dialog>
+<div id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script>
+const STATUS={"Bersertifikat":"#1f8a5b","Dalam proses":"#d99a1e","Sengketa":"#c4372c","Disewakan":"#3b6fb6"};
+const KMLC={"Bersertifikat":"ff5b8a1f","Dalam proses":"ff1e9ad9","Sengketa":"ff2c37c4","Disewakan":"ffb66f3b"};
+const HAK=["SHM","SHGB","SHP","Girik","AJB","Lainnya"];
+const FIELDS=[["kode","Kode aset"],["nama","Nama / peruntukan"],["lokasi","Alamat / lokasi"],["hak","Jenis hak",HAK],["sertifikat","No. sertifikat"],["pemilik","Atas nama"],["status","Status",Object.keys(STATUS)],["nilai","Nilai taksiran (Rp)","number"],["driveUrl","Link dokumen di Drive (URL)"],["catatan","Catatan","textarea"]];
+const LS="aset-tanah-v1", LSS="aset-tanah-set";
+let assets=[], sel=null, S={clientId:"",fileId:"",folderId:""}, tok=null, tokExp=0, q="", fs="";
+try{assets=JSON.parse(localStorage.getItem(LS)||"[]");S=Object.assign(S,JSON.parse(localStorage.getItem(LSS)||"{}"))}catch(e){}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",3500)}
+function persist(){try{localStorage.setItem(LS,JSON.stringify(assets))}catch(e){toast("Penyimpanan lokal penuh")}}
+function areaOf(c){let a=0,R=6378137,d=Math.PI/180,n=c.length;for(let i=0;i<n;i++){const p=c[i],r=c[(i+1)%n];a+=(r[1]-p[1])*d*(2+Math.sin(p[0]*d)+Math.sin(r[0]*d))}return Math.abs(a*R*R/2)}
+function center(c){return[c.reduce((s,p)=>s+p[0],0)/c.length,c.reduce((s,p)=>s+p[1],0)/c.length]}
+const fmt=n=>n.toLocaleString("id-ID",{maximumFractionDigits:0});
+const fmt2=n=>n.toLocaleString("id-ID",{maximumFractionDigits:2});
+
+/* Peta */
+const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Esri World Imagery"});
+const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"});
+const map=L.map("map",{layers:[sat]}).setView([-6.2,106.82],12);
+L.control.layers({"Satelit":sat,"Peta jalan":osm}).addTo(map);
+const group=L.featureGroup().addTo(map), layers={};
+const drawCtl=new L.Control.Draw({edit:{featureGroup:group},draw:{polygon:{allowIntersection:false,showArea:false},polyline:false,rectangle:true,circle:false,marker:false,circlemarker:false}});
+
+function styleOf(a){const on=a.id===sel;return{color:on?"#fff":STATUS[a.status]||"#888",weight:on?4:2,fillColor:STATUS[a.status]||"#888",fillOpacity:on?.45:.3}}
+function draw(){
+  group.clearLayers();for(const k in layers)delete layers[k];
+  assets.forEach(a=>{const p=L.polygon(a.coords,styleOf(a)).addTo(group);p._aid=a.id;layers[a.id]=p;
+    p.bindTooltip(esc(a.kode||a.nama||"Tanpa nama")+" · "+fmt(a.luas)+" m²",{sticky:true});
+    p.on("click",()=>select(a.id,false))});
+}
+map.on(L.Draw.Event.CREATED,e=>{
+  const c=e.layer.getLatLngs()[0].map(p=>[+p.lat.toFixed(7),+p.lng.toFixed(7)]);
+  const a={id:"a"+Date.now(),kode:"T-"+String(assets.length+1).padStart(3,"0"),nama:"",lokasi:"",hak:"SHM",sertifikat:"",pemilik:"",status:"Bersertifikat",nilai:"",driveUrl:"",catatan:"",coords:c,luas:areaOf(c)};
+  assets.push(a);persist();draw();select(a.id,false);toast("Polygon tersimpan. Lengkapi datanya di panel kiri.")});
+map.on(L.Draw.Event.EDITED,e=>{e.layers.eachLayer(l=>{const a=assets.find(x=>x.id===l._aid);if(!a)return;
+  a.coords=l.getLatLngs()[0].map(p=>[+p.lat.toFixed(7),+p.lng.toFixed(7)]);a.luas=areaOf(a.coords)});persist();draw();render()});
+map.on(L.Draw.Event.DELETED,e=>{e.layers.eachLayer(l=>{assets=assets.filter(x=>x.id!==l._aid);if(sel===l._aid)sel=null});persist();draw();render()});
+
+/* Admin */
+let admin=false;
+const sha=async s=>{try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("aset-tanah:"+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return"p"+btoa(unescape(encodeURIComponent(s)))}};
+function setAdmin(on){admin=on;document.querySelectorAll(".adm").forEach(b=>b.hidden=!on);$("bAdmin").textContent=on?"Keluar admin":"Masuk admin";
+  if(on&&!drawCtl._map)map.addControl(drawCtl);if(!on&&drawCtl._map)map.removeControl(drawCtl);render()}
+function fieldHtml(k,l,t,v,dis){const d=dis?" disabled":"";return `<label><span>${l}</span>${Array.isArray(t)?`<select data-k="${k}"${d}>${t.map(o=>`<option${v===o?" selected":""}>${o}</option>`).join("")}</select>`:t==="textarea"?`<textarea data-k="${k}"${d}>${esc(v)}</textarea>`:`<input data-k="${k}" type="${t||"text"}" value="${esc(v)}"${d}>`}</label>`}
+function parseCoords(t){const c=[];for(const ln of t.split(/\n/)){const s=ln.trim();if(!s)continue;const n=s.split(/[\s,;]+/).map(Number);if(n.length<2||n.some(isNaN))return"Baris tidak valid: "+s;c.push([n[0],n[1]])}
+  if(c.some(p=>Math.abs(p[0])>90)&&c.every(p=>Math.abs(p[1])<=90))c.forEach(p=>p.reverse());
+  if(c.length>3&&c[0][0]===c[c.length-1][0]&&c[0][1]===c[c.length-1][1])c.pop();
+  if(c.length<3)return"Minimal 3 titik koordinat";
+  if(c.some(p=>Math.abs(p[0])>90||Math.abs(p[1])>180))return"Koordinat di luar jangkauan (lat -90 s/d 90, lng -180 s/d 180)";
+  return c.map(p=>[+p[0].toFixed(7),+p[1].toFixed(7)])}
+$("bAdmin").onclick=()=>{if(admin)return setAdmin(false);
+  const mk=!S.pin;$("pTitle").textContent=mk?"Buat PIN admin":"Masuk sebagai admin";
+  $("pHelp").textContent=mk?"Belum ada PIN. Buat PIN (minimal 4 karakter). PIN ikut tersimpan di file Drive agar berlaku untuk seluruh tim.":"Masukkan PIN admin.";
+  $("pCw").hidden=!mk;$("pIn").value=$("pIn2").value="";$("pErr").textContent="";$("dPin").showModal()};
+$("pOk").onclick=async()=>{const v=$("pIn").value;
+  if(!S.pin){if(v.length<4)return $("pErr").textContent="PIN minimal 4 karakter";if(v!==$("pIn2").value)return $("pErr").textContent="PIN tidak sama";S.pin=await sha(v);localStorage.setItem(LSS,JSON.stringify(S))}
+  else if(await sha(v)!==S.pin)return $("pErr").textContent="PIN salah";
+  $("dPin").close();setAdmin(true);toast("Mode admin aktif")};
+$("pNo").onclick=()=>$("dPin").close();
+$("bAdd").onclick=()=>{$("addForm").innerHTML=`<label><span>Impor dari file KML atau GeoJSON</span><input type="file" id="aFile" accept=".kml,.geojson,.json"></label><p class="note" style="margin:-4px 0 14px">Satu polygon: koordinat dan data di file mengisi form ini, lalu Anda lengkapi dan simpan. Banyak polygon: semuanya langsung diimpor sebagai aset.</p>`+FIELDS.map(([k,l,t])=>fieldHtml(k,l,t,k==="kode"?"T-"+String(assets.length+1).padStart(3,"0"):"",false)).join("")+`<label><span>Koordinat polygon (satu titik per baris: lat, lng). Bisa ditempel dari Google Earth atau Maps.</span><textarea class="coords" id="aCoords"></textarea></label><p class="note" style="margin:0">Belum punya koordinat? Tutup form ini dan gambar polygon langsung di peta.</p>`;
+  $("aCoords").placeholder="-6.200000, 106.816666\n-6.200100, 106.817200\n-6.200500, 106.816900";amsg("");bindImp();$("dAdd").showModal()};
+$("aNo").onclick=()=>$("dAdd").close();
+$("aOk").onclick=()=>{const c=parseCoords($("aCoords").value);if(typeof c==="string")return amsg(c);
+  const a={id:"a"+Date.now(),coords:c,luas:areaOf(c),updated:new Date().toISOString()};
+  $("addForm").querySelectorAll("[data-k]").forEach(el=>a[el.dataset.k]=el.value);
+  assets.push(a);persist();$("dAdd").close();draw();select(a.id);toast("Aset ditambahkan")};
+
+/* Panel */
+function select(id,fit=true){sel=id;draw();render();if(fit&&layers[id])map.fitBounds(layers[id].getBounds(),{maxZoom:19,padding:[40,40]})}
+function render(){
+  const s=$("side"),a=assets.find(x=>x.id===sel);
+  if(a){
+    s.innerHTML=`<button id="back">← Semua aset</button>
+    <div class="area" style="margin-top:10px"><b>${fmt(a.luas)} m²</b><br>${fmt2(a.luas/10000)} hektar · ${a.coords.length} titik batas</div>${admin?"":`<p class="note">Mode lihat saja. Masuk admin untuk mengubah data.</p>`}
+    ${FIELDS.map(([k,l,t])=>fieldHtml(k,l,t,a[k],!admin)).join("")}
+    ${admin?`<label><span>Koordinat polygon (satu titik per baris: lat, lng)</span><textarea class="coords" id="cEdit">${a.coords.map(p=>p.join(", ")).join("\n")}</textarea></label><div class="row" style="margin-top:0"><button id="bCoord">Terapkan koordinat</button></div>`:""}
+    <div class="row">
+      <button id="bEarth">Buka di Google Earth</button>
+      <button id="bDoc"${/^https?:\/\//.test(a.driveUrl)?"":" disabled"}>Buka dokumen Drive</button>
+      ${admin?`<button class="danger" id="bDel">Hapus aset</button>`:""}
+    </div>`;
+    $("back").onclick=()=>{sel=null;draw();render()};
+    s.querySelectorAll("[data-k]").forEach(el=>el.oninput=()=>{a[el.dataset.k]=el.value;a.updated=new Date().toISOString();persist();
+      if(el.dataset.k==="status")draw();else layers[a.id]&&layers[a.id].setTooltipContent(esc(a.kode||a.nama||"Tanpa nama")+" · "+fmt(a.luas)+" m²");
+      $("bDoc").disabled=!/^https?:\/\//.test(a.driveUrl)});
+    if(admin)$("bCoord").onclick=()=>{const c=parseCoords($("cEdit").value);if(typeof c==="string")return toast(c);a.coords=c;a.luas=areaOf(c);a.updated=new Date().toISOString();persist();draw();select(a.id);toast("Koordinat diperbarui")};
+    $("bEarth").onclick=()=>{const c=center(a.coords);window.open(`https://earth.google.com/web/@${c[0]},${c[1]},0a,400d,35y,0h,0t,0r`,"_blank","noopener")};
+    $("bDoc").onclick=()=>window.open(a.driveUrl,"_blank","noopener");
+    if(admin)$("bDel").onclick=()=>{if(confirm("Hapus aset "+(a.kode||a.nama)+"?")){assets=assets.filter(x=>x.id!==a.id);sel=null;persist();draw();render()}};
+    return;
+  }
+  const list=assets.filter(x=>(!fs||x.status===fs)&&(x.kode+" "+x.nama+" "+x.lokasi+" "+x.pemilik+" "+x.sertifikat).toLowerCase().includes(q.toLowerCase()));
+  const tot=assets.reduce((n,x)=>n+x.luas,0),val=assets.reduce((n,x)=>n+(+x.nilai||0),0);
+  s.innerHTML=`<div class="stats"><div><b>${assets.length}</b><span>bidang tanah</span></div><div><b>${fmt2(tot/10000)} ha</b><span>total luas</span></div><div style="grid-column:1/3"><b>Rp ${fmt(val)}</b><span>total nilai taksiran</span></div></div>
+  <div class="tools"><input id="q" placeholder="Cari kode, nama, pemilik…" value="${esc(q)}"><select id="fs" style="width:auto"><option value="">Semua</option>${Object.keys(STATUS).map(o=>`<option${fs===o?" selected":""}>${o}</option>`).join("")}</select></div>
+  ${list.length?list.map(x=>`<button class="item" data-id="${x.id}"><i class="dot" style="background:${STATUS[x.status]||"#888"}"></i><span><b>${esc(x.kode||"—")}</b> ${esc(x.nama)}<small>${fmt(x.luas)} m² · ${esc(x.status)}${x.pemilik?" · "+esc(x.pemilik):""}</small></span></button>`).join(""):
+  `<div class="empty">${assets.length?"Tidak ada aset yang cocok.":admin?"Belum ada aset. Pakai tombol “+ Tambah aset” untuk mengisi data dan koordinat, atau gambar polygon langsung di peta (tombol polygon di kiri atas peta).":"Belum ada aset. Masuk sebagai admin untuk menambah data, atau ambil data dari Drive."}</div>`}`;
+  $("q").oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();$("q").focus();$("q").setSelectionRange(p,p)};
+  $("fs").onchange=e=>{fs=e.target.value;render()};
+  s.querySelectorAll(".item").forEach(b=>b.onclick=()=>select(b.dataset.id));
+}
+
+/* Ekspor / impor */
+function dl(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+const meta=a=>({id:a.id,kode:a.kode,nama:a.nama,lokasi:a.lokasi,hak:a.hak,sertifikat:a.sertifikat,pemilik:a.pemilik,status:a.status,nilai:a.nilai,driveUrl:a.driveUrl,catatan:a.catatan,luas_m2:Math.round(a.luas)});
+const ring=a=>a.coords.concat([a.coords[0]]);
+$("bGeo").onclick=()=>dl("aset-tanah.geojson",JSON.stringify({type:"FeatureCollection",features:assets.map(a=>({type:"Feature",properties:meta(a),geometry:{type:"Polygon",coordinates:[ring(a).map(p=>[p[1],p[0]])]}}))},null,1),"application/geo+json");
+$("bKml").onclick=()=>{
+  const x=s=>esc(s);
+  const styles=Object.keys(KMLC).map(k=>`<Style id="s-${k.replace(/ /g,"_")}"><LineStyle><color>${KMLC[k]}</color><width>2</width></LineStyle><PolyStyle><color>88${KMLC[k].slice(2)}</color></PolyStyle></Style>`).join("");
+  const pm=assets.map(a=>`<Placemark><name>${x(a.kode)} ${x(a.nama)}</name><styleUrl>#s-${(a.status||"").replace(/ /g,"_")}</styleUrl><description><![CDATA[<b>Luas:</b> ${fmt(a.luas)} m² (${fmt2(a.luas/10000)} ha)<br><b>Lokasi:</b> ${x(a.lokasi)}<br><b>Hak:</b> ${x(a.hak)} ${x(a.sertifikat)}<br><b>Atas nama:</b> ${x(a.pemilik)}<br><b>Status:</b> ${x(a.status)}<br><b>Nilai:</b> Rp ${fmt(+a.nilai||0)}<br><b>Catatan:</b> ${x(a.catatan)}${/^https?:/.test(a.driveUrl)?`<br><a href="${x(a.driveUrl)}">Dokumen di Drive</a>`:""}]]></description><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring(a).map(p=>p[1]+","+p[0]+",0").join(" ")}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`).join("");
+  dl("aset-tanah.kml",`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Aset Tanah</name>${styles}${pm}</Document></kml>`,"application/vnd.google-earth.kml+xml");
+  toast("KML siap. Di Google Earth: Proyek baru → Impor file KML, atau simpan KML ke Drive lalu buka dari Drive.")};
+$("bCsv").onclick=()=>{const h=["kode","nama","lokasi","hak","sertifikat","pemilik","status","nilai","luas_m2","luas_ha","driveUrl","catatan"];
+  const c=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  dl("aset-tanah.csv",[h.join(",")].concat(assets.map(a=>h.map(k=>c(k==="luas_m2"?Math.round(a.luas):k==="luas_ha"?(a.luas/10000).toFixed(4):a[k])).join(","))).join("\n"),"text/csv")};
+$("bImp").onclick=()=>$("file").click();
+function parseGeo(t,name){let add=[];
+  const ring=c=>{if(c.length>3&&c[0][0]===c[c.length-1][0]&&c[0][1]===c[c.length-1][1])c.pop();return c};
+  if(/\.kml$/i.test(name)||/^\s*(<\?xml|<kml)/i.test(t)){const d=new DOMParser().parseFromString(t,"text/xml");
+    d.querySelectorAll("Placemark").forEach(pm=>{pm.querySelectorAll("Polygon").forEach(pg=>{const co=pg.querySelector("outerBoundaryIs coordinates");if(!co)return;
+      const c=ring(co.textContent.trim().split(/\s+/).map(s=>s.split(",").map(Number)).filter(p=>p.length>=2&&!isNaN(p[0])&&!isNaN(p[1])).map(p=>[p[1],p[0]]));
+      const nm=pm.querySelector("name");add.push({nama:nm?nm.textContent.trim():"",coords:c})})})}
+  else{const g=JSON.parse(t);
+    const fts=g.type==="FeatureCollection"?g.features||[]:g.type==="Feature"?[g]:g.type?[{properties:{},geometry:g}]:[];
+    fts.forEach(ft=>{const gm=ft&&ft.geometry;if(!gm)return;const pr=ft.properties||{};
+      const polys=gm.type==="Polygon"?[gm.coordinates]:gm.type==="MultiPolygon"?gm.coordinates:[];
+      polys.forEach(pc=>add.push(Object.assign({},pr,{coords:ring(pc[0].map(p=>[p[1],p[0]]))})))})}
+  return add.filter(a=>a.coords.length>=3).map(a=>(a.coords=a.coords.map(p=>[+p[0].toFixed(7),+p[1].toFixed(7)]),a))}
+const blank=()=>({kode:"T-"+String(assets.length+1).padStart(3,"0"),nama:"",lokasi:"",hak:"SHM",sertifikat:"",pemilik:"",status:"Bersertifikat",nilai:"",driveUrl:"",catatan:""});
+function addMany(add){add.forEach((a,i)=>{const o=Object.assign(blank(),a,{id:"a"+Date.now()+i,luas:areaOf(a.coords),updated:new Date().toISOString()});
+  if(!STATUS[o.status])o.status="Bersertifikat";if(!HAK.includes(o.hak))o.hak="SHM";assets.push(o)});persist();draw();render()}
+function amsg(t,ok){const e=$("aErr");e.style.color=ok?"var(--acc)":"var(--bad)";e.textContent=t}
+function bindImp(){$("aFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;amsg("");let add;
+  try{add=parseGeo(await f.text(),f.name)}catch(err){return amsg("File tidak bisa dibaca. Pastikan formatnya KML atau GeoJSON.")}
+  if(!add.length)return amsg("Tidak ada polygon di file ini");
+  if(add.length>1){addMany(add);$("dAdd").close();map.fitBounds(group.getBounds());return toast(add.length+" polygon diimpor")}
+  const a=add[0];$("addForm").querySelectorAll("[data-k]").forEach(el=>{const v=a[el.dataset.k];if(v!==undefined&&v!==null&&v!=="")el.value=v});
+  $("aCoords").value=a.coords.map(p=>p.join(", ")).join("\n");amsg("Polygon dari file sudah diisi ke form. Lengkapi datanya lalu klik Simpan aset.",true)}}
+$("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;let add;
+  try{add=parseGeo(await f.text(),f.name)}catch(err){return toast("File tidak bisa dibaca")}
+  if(!add.length)return toast("Tidak ada polygon di file ini");
+  addMany(add);map.fitBounds(group.getBounds());toast(add.length+" polygon diimpor")};
+
+/* Google Drive */
+function auth(){return new Promise((ok,no)=>{
+  if(!S.clientId){$("dlg").showModal();return no(new Error("Isi Client ID dulu"))}
+  if(tok&&Date.now()<tokExp)return ok();
+  if(!window.google||!google.accounts)return no(new Error("Library Google belum termuat, cek koneksi"));
+  google.accounts.oauth2.initTokenClient({client_id:S.clientId,scope:"https://www.googleapis.com/auth/drive",
+    callback:r=>{if(r.access_token){tok=r.access_token;tokExp=Date.now()+3000*1000;ok()}else no(new Error("Login Google gagal"))},
+    error_callback:()=>no(new Error("Login Google dibatalkan"))}).requestAccessToken()})}
+$("bSave").onclick=async()=>{try{await auth();const body=JSON.stringify({version:1,saved:new Date().toISOString(),pin:S.pin||"",assets});let r;
+  if(S.fileId)r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${S.fileId}?uploadType=media`,{method:"PATCH",headers:{Authorization:"Bearer "+tok,"Content-Type":"application/json"},body});
+  else{const b="b"+Date.now(),m={name:"aset-tanah.json",mimeType:"application/json"};if(S.folderId)m.parents=[S.folderId];
+    r=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{Authorization:"Bearer "+tok,"Content-Type":"multipart/related; boundary="+b},
+      body:`--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(m)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`})}
+  if(!r.ok)throw new Error("Drive menolak ("+r.status+")");
+  if(!S.fileId){S.fileId=(await r.json()).id;localStorage.setItem(LSS,JSON.stringify(S));toast("File dibuat di Drive. Bagikan file itu ke tim, lalu kirim ID-nya: "+S.fileId)}else toast("Tersimpan ke Drive")}
+  catch(e){tok=null;toast(e.message)}};
+$("bLoad").onclick=async()=>{try{if(!S.fileId){$("dlg").showModal();throw new Error("Isi ID file Drive dulu")}await auth();
+  const r=await fetch(`https://www.googleapis.com/drive/v3/files/${S.fileId}?alt=media`,{headers:{Authorization:"Bearer "+tok}});
+  if(!r.ok)throw new Error("Gagal membaca file ("+r.status+")");const d=await r.json();if(d.pin){S.pin=d.pin;localStorage.setItem(LSS,JSON.stringify(S))}
+  if(!confirm("Ganti "+assets.length+" aset di perangkat ini dengan "+(d.assets||[]).length+" aset dari Drive?"))return;
+  assets=d.assets||[];sel=null;persist();draw();render();if(assets.length)map.fitBounds(group.getBounds());toast("Data dimuat dari Drive")}catch(e){tok=null;toast(e.message)}};
+$("bSet").onclick=()=>{$("sClient").value=S.clientId;$("sFile").value=S.fileId;$("sFolder").value=S.folderId;$("dlg").showModal()};
+$("sOk").onclick=()=>{S=Object.assign(S,{clientId:$("sClient").value.trim(),fileId:$("sFile").value.trim(),folderId:$("sFolder").value.trim()});localStorage.setItem(LSS,JSON.stringify(S));tok=null;$("dlg").close();toast("Pengaturan tersimpan")};
+$("sNo").onclick=()=>$("dlg").close();
+
+draw();setAdmin(false);if(assets.length)map.fitBounds(group.getBounds(),{padding:[30,30]});
+</script>
+</body>
+</html>
