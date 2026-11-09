@@ -1678,6 +1678,7 @@
             }
 
             saveAssetsToStorage();
+		persistToFirebase();
             closeAssetFormModal();
             selectedAssetId = assetData.id;
             renderAll();
@@ -2205,5 +2206,32 @@
             }, 4000);
         }
     </script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCL088TuE-hprEcxjpaACXsVY5cc5qVJfk",
+    authDomain: "manajemen-data-aset.firebaseapp.com",
+    databaseURL: "https://manajemen-data-aset-default-rtdb.firebaseio.com",
+    projectId: "manajemen-data-aset",
+    storageBucket: "manajemen-data-aset.firebasestorage.app",
+    messagingSenderId: "564939840608",
+    appId: "1:564939840608:web:809585d1e2a0cf0bf03705",
+    measurementId: "G-ZHFSXWMTYY"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const dbRef = firebase.database().ref("peta_aset/data");
+
+  // Fungsi simpan manual yang aman dari freeze
+  function persistToFirebase() {
+    const dataObj = {};
+    if (typeof assets !== 'undefined') {
+      assets.forEach(a => { if(a && a.id) dataObj[a.id] = a; });
+      dbRef.set(dataObj).then(() => {
+        console.log("Data berhasil disinkronkan ke Firebase!");
+      }).catch(err => console.log("Gagal sync:", err));
+    }
+  }
+</script>
 </body>
 </html>
