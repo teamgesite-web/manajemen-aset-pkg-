@@ -1799,10 +1799,17 @@
                                 </p>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
-                                <button type="button" onclick="openAssetPDF('${asset.id}')" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
-                                    <i class="fa-solid fa-up-right-from-square"></i>
-                                    <span>Buka / Unduh PDF</span>
-                                </button>
+                                <!-- Tombol Lihat PDF (Pratinjau) -->
+<button type="button" onclick="window.open('${asset.pdfDriveUrl || asset.pdfUrl}', '_blank')" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+  <i class="fa-solid fa-eye"></i>
+  <span>Lihat PDF</span>
+</button>
+
+<!-- Tombol Unduh PDF -->
+<button type="button" onclick="const url = '${asset.pdfDriveUrl || asset.pdfUrl}'; window.open(url.replace('/view?usp=sharing', '/uc?export=download').replace('/edit', '/uc?export=download'), '_blank')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+  <i class="fa-solid fa-download"></i>
+  <span>Unduh PDF</span>
+</button>
                                 ${isAdmin ? `
                                     <button type="button" onclick="uploadSingleAssetPDFToDrive('${asset.id}')" title="Simpan ke Google Drive" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-medium px-2 py-1.5 rounded-lg">
                                         <i class="fa-brands fa-google-drive"></i>
