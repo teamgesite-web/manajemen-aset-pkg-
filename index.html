@@ -215,9 +215,13 @@
                 
                 <div class="flex items-center justify-between gap-1.5">
                     <select id="filter-category" onchange="renderAssetTable()" class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="ALL">Semua Kategori</option>
-                        <option value="Tanah">Tanah</option>
-                        <option value="Bangunan">Bangunan</option>
+    <option value="ALL">Semua Kategori</option>
+    <option value="Tanah">Tanah</option>
+    <option value="Bangunan">Bangunan</option>
+    <!-- Tambahkan dua baris ini -->
+    <option value="Kendaraan">Kendaraan</option>
+    <option value="Elektronik">Elektronik</option>
+</select>
                     </select>
 
                     <button type="button" onclick="openAddAssetModal()" id="btn-table-add" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg items-center gap-1 shrink-0 shadow-sm">
