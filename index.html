@@ -898,7 +898,7 @@
             );
 
             // Hybrid Group (Satelit + Label)
-            const satelliteHybrid = L.layerGroup([esriSatellite, esriLabels]).addTo(map);
+            const satelliteHybrid = L.layerGroup([esriSatellite, esriLabels]);
 
             // Layer 2: Google Hybrid Satellite Fallback
             const googleHybrid = L.tileLayer(
@@ -908,7 +908,7 @@
                     subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
                     attribution: '&copy; Google Maps'
                 }
-            );
+            );.addTo(map)
 
             // Layer 3: OpenStreetMap
             const osmStreet = L.tileLayer(
