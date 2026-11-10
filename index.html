@@ -1911,11 +1911,13 @@
             const filtered = assets.filter(a => {
                 const matchesCat = catFilter === 'ALL' || a.category === catFilter;
                 const matchesQuery = !searchQuery || 
-                    a.code.toLowerCase().includes(searchQuery) ||
-                    a.name.toLowerCase().includes(searchQuery) ||
-                    a.location.toLowerCase().includes(searchQuery) ||
-                    (a.status && a.status.toLowerCase().includes(searchQuery)) ||
-                    (a.certNo && a.certNo.toLowerCase().includes(searchQuery));
+            (a.code && a.code.toLowerCase().includes(searchQuery)) || 
+            (a.name && a.name.toLowerCase().includes(searchQuery)) || 
+            (a.location && a.location.toLowerCase().includes(searchQuery)) || 
+            (a.status && a.status.toLowerCase().includes(searchQuery)) || 
+            (a.certNo && a.certNo.toLowerCase().includes(searchQuery)) ||
+            (a.keterangan && a.keterangan.toLowerCase().includes(searchQuery)) ||
+            (a.owner && a.owner.toLowerCase().includes(searchQuery));
                 return matchesCat && matchesQuery;
             });
 
