@@ -1830,6 +1830,10 @@
                         ${asset.notes || 'Tidak ada catatan tambahan.'}
                     </div>
                 </div>
+				<!-- Tombol Rute Google Maps -->
+<a href="https://www.google.com/maps/search/?api=1&query=${asset.center}" target="_blank" style="display: block; background: #28a745; color: white; text-align: center; padding: 10px; border-radius: 6px; text-decoration: none; margin-top: 15px; font-weight: bold;">
+  📍 Buka Rute Google Maps
+</a>
             `;
 
             document.getElementById('btn-detail-zoom').onclick = () => zoomToSingleAsset(asset);
