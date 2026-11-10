@@ -189,7 +189,7 @@
         </div>
 
         <!-- Kartu 5: Sertifikat Resmi -->
-        <div class="col-span-2 md:col-span-1 flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70">
+        <div onclick="filterByLegalitas('SHM')" class="col-span-2 md:col-span-1 flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70 cursor-pointer hover:border-blue-400 transition">
             <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
                 <i class="fa-solid fa-file-shield text-sm"></i>
             </div>
@@ -2277,6 +2277,15 @@ firebase.database().ref("peta_aset").on('value', (snapshot) => {
     console.log("Data berhasil disinkronkan secara real-time dari Firebase!");
   }
 });
+	// Fungsi untuk memfilter aset saat kartu ringkasan diklik
+function filterByLegalitas(jenis) {
+  const searchInput = document.getElementById('search-input') || document.querySelector('input[type="text"]');
+  if (searchInput) {
+    searchInput.value = jenis;
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
+  }
+}
 </script>
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; left: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
