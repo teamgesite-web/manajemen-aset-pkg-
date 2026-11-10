@@ -2277,21 +2277,26 @@ firebase.database().ref("peta_aset").on('value', (snapshot) => {
     console.log("Data berhasil disinkronkan secara real-time dari Firebase!");
   }
 });
-	// Fungsi untuk memfilter aset berdasarkan legalitas saat kartu diklik
+	// Fungsi untuk memfilter aset saat kartu diklik (Versi Langsung)
 function filterByLegalitas(jenis) {
-  const selectLegalitas = document.getElementById('filter-legalitas') || document.querySelector('select[name="legalitas"]');
+  // Cari kolom pencarian utama
+  const searchInput = document.getElementById('search-input') || document.querySelector('input[type="text"]');
   
-  if (selectLegalitas) {
-    if (selectLegalitas.value === jenis) {
-      selectLegalitas.value = "";
+  if (searchInput) {
+    // Jika kotak pencarian sudah berisi 'SHM', klik lagi untuk menghapus/reset filter
+    if (searchInput.value === jenis) {
+      searchInput.value = "";
     } else {
-      selectLegalitas.value = jenis;
-    }
-    selectLegalitas.dispatchEvent(new Event('change', { bubbles: true }));
-  } else {
-    const searchInput = document.getElementById('search-input') || document.querySelector('input[type="text"]');
-    if (searchInput) {
       searchInput.value = jenis;
+    }
+    
+    // Panggil fungsi filter atau pencarian data yang ada di aplikasi Anda secara langsung
+    if (typeof filterAssets === 'function') {
+      filterAssets();
+    } else if (typeof renderTable === 'function') {
+      renderTable();
+    } else {
+      // Picu event secara otomatis jika fungsi spesifik tidak ditemukan
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
       searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
     }
