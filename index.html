@@ -2314,8 +2314,12 @@ function filterByLegalitas(jenis) {
 }
 
 // Tambahkan fungsi di sini (sebelum penutup tag script)
+// Fungsi untuk mengubah label dan placeholder secara dinamis
 function handleCategoryChange() {
-  const category = document.getElementById('form-category').value;
+  const categorySelect = document.getElementById('form-category');
+  if (!categorySelect) return;
+  
+  const category = categorySelect.value;
   
   const labelLegalitas = document.getElementById('label-legalitas');
   const labelNoDokumen = document.getElementById('label-no-dokumen');
@@ -2335,10 +2339,20 @@ function handleCategoryChange() {
   } else {
     if (labelLegalitas) labelLegalitas.innerText = 'Status Legalitas';
     if (labelNoDokumen) labelNoDokumen.innerText = 'No. Sertifikat / Dokumen';
-    if (labelLuas) labelLuas.innerText = 'Luas Area (m²) *';
+    if (labelLuas) labelLuas.innerHTML = 'Luas Area (m²) <span class="text-rose-500">*</span>';
     if (inputNoDoc) inputNoDoc.placeholder = 'SHM No. 01234/Klapanunggal';
   }
 }
+
+// Pasang event listener otomatis begitu halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.getElementById('form-category');
+  if (categorySelect) {
+    categorySelect.addEventListener('change', handleCategoryChange);
+    // Jalankan sekali saat awal muat untuk menyesuaikan status default
+    handleCategoryChange();
+  }
+});
 </script>
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; left: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
