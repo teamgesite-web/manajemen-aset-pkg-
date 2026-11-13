@@ -1472,8 +1472,14 @@
             document.getElementById('form-id').value = '';
             document.getElementById('modal-form-title').textContent = 'Tambah Data Aset Baru';
             
-            const nextNum = String(assets.length + 1).padStart(3, '0');
-            document.getElementById('form-code').value = `APK-${nextNum}`;
+            const kategoriVal = document.getElementById('form-category').value;
+let prefix = 'AST';
+if (kategoriVal === 'Tanah') prefix = 'TNH';
+else if (kategoriVal === 'Bangunan') prefix = 'BGN';
+else if (kategoriVal === 'Jalan') prefix = 'JLN';
+
+const nextNum = String(assets.length + 1).padStart(3, '0');
+document.getElementById('form-code').value = `${prefix}-${nextNum}`;
             document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('polygon-parse-status').innerHTML = 
                 `<i class="fa-solid fa-circle-info"></i> <span>Unggah file .kml dari Google Earth / GIS, luas area (m²) dan titik pusat akan terhitung otomatis.</span>`;
