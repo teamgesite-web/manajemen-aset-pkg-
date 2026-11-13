@@ -1995,6 +1995,7 @@
             (a.location && a.location.toLowerCase().includes(searchQuery)) || 
             (a.status && a.status.toLowerCase().includes(searchQuery)) || 
             (a.certNo && a.certNo.toLowerCase().includes(searchQuery)) ||
+					(a.legality && a.legality.toLowerCase().includes(searchQuery)) ||
             (a.keterangan && a.keterangan.toLowerCase().includes(searchQuery)) ||
             (a.owner && a.owner.toLowerCase().includes(searchQuery));
                 return matchesCat && matchesQuery;
