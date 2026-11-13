@@ -1941,30 +1941,40 @@
             const tanahArea = tanahAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
 
             const bangunanAssets = assets.filter(a => a.category === 'Bangunan');
-            const bangunanCount = bangunanAssets.length;
-            const bangunanArea = bangunanAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
+    const bangunanCount = bangunanAssets.length;
+    const bangunanArea = bangunanAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
 
-            const certifiedCount = assets.filter(a => 
-                a.legality.includes('SHM') || a.legality.includes('HGB') || a.legality.includes('Hak Pakai')
-            ).length;
+    // 1. Hitung jumlah Kendaraan
+    const kendaraanAssets = assets.filter(a => a.category === 'Kendaraan');
+    const kendaraanCount = kendaraanAssets.length;
 
-            document.getElementById('kpi-total-assets').textContent = `${totalUnits} Unit`;
-            document.getElementById('badge-count').textContent = totalUnits;
-            
-            const formatAreaCompact = (area) => area >= 10000 
-                ? `${formatNumber(area)} m² (${(area / 10000).toFixed(2)} Ha)`
-                : `${formatNumber(area)} m²`;
+    // 2. Filter aset selain Kendaraan & Elektronik untuk Sertifikat Resmi
+    const validCertifiedAssets = assets.filter(a => a.category !== 'Kendaraan' && a.category !== 'Elektronik');
+    const certifiedCount = validCertifiedAssets.filter(a => 
+        a.legality && (a.legality.includes('SHM') || a.legality.includes('HGB') || a.legality.includes('Hak Pakai'))
+    ).length;
 
-            document.getElementById('kpi-total-area').textContent = formatAreaCompact(totalArea);
+    document.getElementById('kpi-total-assets').textContent = `${totalUnits} Unit`;
+    document.getElementById('badge-count').textContent = totalUnits;
 
-            document.getElementById('kpi-tanah-count').textContent = `${tanahCount} Bidang`;
-            document.getElementById('kpi-tanah-area').textContent = formatAreaCompact(tanahArea);
+    const formatAreaCompact = (area) => area >= 10000 
+        ? `${formatNumber(area)} m² (${(area / 10000).toFixed(2)} Ha)`
+        : `${formatNumber(area)} m²`;
 
-            document.getElementById('kpi-bangunan-count').textContent = `${bangunanCount} Unit`;
-            document.getElementById('kpi-bangunan-area').textContent = formatAreaCompact(bangunanArea);
+    document.getElementById('kpi-total-area').textContent = formatAreaCompact(totalArea);
 
-            document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${totalUnits} Aset`;
-        }
+    document.getElementById('kpi-tanah-count').textContent = `${tanahCount} Bidang`;
+    document.getElementById('kpi-tanah-area').textContent = formatAreaCompact(tanahArea);
+
+    document.getElementById('kpi-bangunan-count').textContent = `${bangunanCount} Unit`;
+    document.getElementById('kpi-bangunan-area').textContent = formatAreaCompact(bangunanArea);
+
+    // 3. Tampilkan jumlah Kendaraan ke kartu KPI Kendaraan
+    const elKendaraan = document.getElementById('kpi-kendaraan-count');
+    if (elKendaraan) elKendaraan.textContent = `${kendaraanCount} Unit`;
+
+    // 4. Update Sertifikat Resmi hanya membandingkan dari Tanah & Bangunan (bukan Kendaraan)
+    document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${validCertifiedAssets.length} Aset`;
 
         function renderAssetTable() {
             const tbody = document.getElementById('asset-table-body');
