@@ -255,7 +255,7 @@
                         <tr>
                             <th class="py-2 px-2">Kode</th>
                             <th class="py-2 px-2">Atas Nama &amp; Lokasi</th>
-                            <th class="py-2 px-2 text-right">Luas (m²)</th>
+                            <th id="th-luas-label" class="py-2 px-2 text-right">Luas (m²)</th>
                             <th class="py-2 px-2">Status</th>
                             <th class="py-2 px-1.5 text-center">Aksi</th>
                         </tr>
@@ -2016,7 +2016,10 @@ if (isDuplicate) {
             const emptyState = document.getElementById('empty-state');
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const catFilter = document.getElementById('filter-category').value;
-
+const thLabel = document.getElementById('th-luas-label');
+if (thLabel) {
+    thLabel.textContent = (catFilter === 'Kendaraan') ? 'Merk / Type' : 'Luas (m²)';
+}
             const filtered = assets.filter(a => {
                 const matchesCat = catFilter === 'ALL' || a.category === catFilter;
                 const matchesQuery = !searchQuery || 
@@ -2062,8 +2065,8 @@ if (isDuplicate) {
                             <p class="text-[10px] text-slate-500 truncate" title="${asset.location}">${asset.location}</p>
                         </td>
                         <td class="py-2 px-2 text-right font-mono font-semibold text-slate-800 whitespace-nowrap align-top">
-                            ${formatNumber(asset.area)}
-                        </td>
+    ${asset.category === 'Kendaraan' ? (asset.keterangan || '-') : formatNumber(asset.area)}
+</td>
                        <td class="py-2 px-2 align-top">
     <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${asset.category === 'Kendaraan' ? 'bg-blue-50 text-blue-700 border border-blue-200/80 font-mono' : 'bg-amber-50 text-amber-800 border border-amber-200/80'} leading-tight max-w-[95px] truncate" title="${asset.category === 'Kendaraan' ? (asset.certNo || '-') : (asset.status || '-')}">
         ${asset.category === 'Kendaraan' ? (asset.certNo || '-') : (asset.status || '-')}
