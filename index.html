@@ -1824,23 +1824,23 @@
                 <!-- Legalitas & Administrasi -->
                 <div class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 text-xs">
                    <div class="p-3 flex justify-between gap-2">
-                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Kepemilikan' : 'Status Legalitas'}</span>
-                                <span class="font-semibold text-slate-800 text-right">${asset.legality}</span>
+                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Kepemilikan (Pemegang BPKB)' : 'Status Legalitas'}</span>
+                                <span class="font-semibold text-slate-800 text-right">${asset.category === 'Kendaraan' ? (asset.name || '-') : (asset.legality || '-')}</span>
                             </div>
                             <div class="p-3 flex justify-between gap-2">
                                 <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Plat Nomor (Nopol)' : 'Nomor Sertifikat'}</span>
                                 <span class="font-mono font-semibold text-blue-700 text-right">${asset.certNo || '-'}</span>
                             </div>
                     <div class="p-3 flex justify-between gap-2">
-                        <span class="text-slate-500">Titik Koordinat Pusat</span>
-                        <span class="font-mono text-slate-700 text-right">${asset.center || '-'}</span>
-                    </div>
-                    <div class="p-3 flex justify-between gap-2">
-                        <span class="text-slate-500">Poligon Spasial KML</span>
-                        <span class="font-semibold ${polyCount >= 3 ? 'text-emerald-600' : 'text-amber-600'}">
-                            ${polyCount >= 3 ? `<i class="fa-solid fa-check-circle"></i> ${polyCount} Titik Sudut` : 'Belum ada poligon'}
-                        </span>
-                    </div>
+                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Kondisi Kendaraan' : 'Titik Koordinat Pusat'}</span>
+                                <span class="font-mono font-semibold text-slate-700 text-right">${asset.category === 'Kendaraan' ? (asset.status || 'Baik') : (asset.center || '-')}</span>
+                            </div>
+                            <div class="p-3 flex justify-between gap-2">
+                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Jenis / Kategori' : 'Poligon Spasial KML'}</span>
+                                <span class="font-semibold ${asset.category === 'Kendaraan' ? 'text-slate-800' : 'text-amber-600'} text-right">
+                                    ${asset.category === 'Kendaraan' ? (asset.legality || '-') : (polyCount >= 3 ? `${polyCount} Titik Sudut` : 'Belum ada poligon')}
+                                </span>
+                            </div>
                     <div class="p-3 flex justify-between gap-2">
                         <span class="text-slate-500">Tanggal Survei / Input</span>
                         <span class="font-medium text-slate-800">${asset.date || '-'}</span>
