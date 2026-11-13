@@ -2397,7 +2397,14 @@ function handleCategoryChange() {
   const inputNoDoc = document.getElementById('form-cert-no');
   const selectLegality = document.getElementById('form-legality');
   const inputKodeAset = document.getElementById('form-code');
-
+const kendaraanFields = document.getElementById('kendaraan-fields');
+  if (kendaraanFields) {
+    if (category === 'Kendaraan') {
+      kendaraanFields.style.display = 'block';
+    } else {
+      kendaraanFields.style.display = 'none';
+    }
+  }
   if (category === 'Kendaraan') {
     if (labelLegalitas) labelLegalitas.innerText = 'Kondisi / Jenis Kendaraan';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
