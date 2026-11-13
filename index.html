@@ -2575,19 +2575,19 @@ function filterKategori(kategori) {
         console.log("Data difilter:", filtered);
     }
 }
-	// --- PAKSA UPDATE KODE ASET SAAT HALAMAN DIBUKA ---
-document.addEventListener("DOMContentLoaded", function() {
+	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
+window.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         const catEl = document.getElementById('form-category') || document.getElementById('kategori');
         const codeEl = document.getElementById('form-code') || document.getElementById('kode');
         
         if (catEl && codeEl && typeof generateNextAssetCode === 'function') {
-            const newCode = generateNextAssetCode(catEl.value);
-            codeEl.value = newCode; // Memaksa menimpa nilai TNH-055
-        } else if (typeof handleCategoryChange === 'function') {
-            handleCategoryChange();
+            // Hitung nomor urut baru berdasarkan kategori aktif
+            const nextCode = generateNextAssetCode(catEl.value);
+            codeEl.value = nextCode;
+            console.log("Kode Aset Diperbarui ke:", nextCode);
         }
-    }, 600);
+    }, 500);
 });
 </script>
 </body>
