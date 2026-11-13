@@ -2575,6 +2575,20 @@ function filterKategori(kategori) {
         console.log("Data difilter:", filtered);
     }
 }
+	// --- AUTO-GENERATE KODE SAAT HALAMAN PERTAMA KALI DIBUKA ---
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(() => {
+        if (typeof handleCategoryChange === 'function') {
+            handleCategoryChange();
+        } else {
+            const catEl = document.getElementById('form-category') || document.getElementById('kategori');
+            const codeEl = document.getElementById('form-code') || document.getElementById('kode');
+            if (catEl && codeEl && typeof generateNextAssetCode === 'function') {
+                codeEl.value = generateNextAssetCode(catEl.value);
+            }
+        }
+    }, 500);
+});
 </script>
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; left: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
