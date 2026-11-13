@@ -1933,12 +1933,15 @@
         }
 
         function renderKPIs() {
-            const totalUnits = assets.length;
-            const totalArea = assets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
-            
-            const tanahAssets = assets.filter(a => a.category === 'Tanah');
-            const tanahCount = tanahAssets.length;
-            const tanahArea = tanahAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
+           const totalUnits = assets.length;
+
+    // Hitung data Tanah terlebih dahulu di atas
+    const tanahAssets = assets.filter(a => a.category === 'Tanah' || !a.category);
+    const tanahCount = tanahAssets.length;
+    const tanahArea = tanahAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
+
+    // Total Luas Area Poligon murni hanya mengambil dari total luas tanah
+    const totalArea = tanahArea;
 
             const bangunanAssets = assets.filter(a => a.category === 'Bangunan');
     const bangunanCount = bangunanAssets.length;
@@ -1954,7 +1957,7 @@
         a.legality && (a.legality.includes('SHM') || a.legality.includes('HGB') || a.legality.includes('Hak Pakai'))
     ).length;
 
-    document.getElementById('kpi-total-assets').textContent = `${totalUnits} Unit`;
+    document.getElementById('kpi-total-assets').textContent = `${totalUnits} Aset`;
     document.getElementById('badge-count').textContent = totalUnits;
 
     const formatAreaCompact = (area) => area >= 10000 
