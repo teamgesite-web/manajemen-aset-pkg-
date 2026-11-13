@@ -2426,26 +2426,38 @@ function filterByLegalitas(jenis) {
 function generateNextAssetCode(prefix) {
     const targetPrefix = (prefix || 'TNH').trim();
     
-    const existingNumbers = (window.allAssets || assets || [])
-        .map(item => {
-            const code = (item.code || item.kode || '').trim();
-            if (code.startsWith(targetPrefix + '-')) {
-                const numPart = parseInt(code.split('-')[1], 10);
-                return isNaN(numPart) ? 0 : numPart;
+    let codes = [];
+    if (typeof assets !== 'undefined' && Array.isArray(assets)) {
+        codes = codes.concat(assets.map(item => item.code || item.kode || ''));
+    }
+    if (typeof window.allAssets !== 'undefined' && Array.isArray(window.allAssets)) {
+        codes = codes.concat(window.allAssets.map(item => item.code || item.kode || ''));
+    }
+    
+    // Ambil juga teks kode yang sedang tampil di halaman/tabel agar sinkron
+    document.querySelectorAll('td, span, div, input, option').forEach(el => {
+        const val = el.value || el.innerText || '';
+        if (val.includes(targetPrefix + '-')) {
+            codes.push(val.trim());
+        }
+    });
+
+    const existingNumbers = codes
+        .map(code => {
+            if (code && code.includes(targetPrefix + '-')) {
+                const parts = code.split('-');
+                if (parts.length >= 2 && parts[0].trim() === targetPrefix) {
+                    const numPart = parseInt(parts[1], 10);
+                    return isNaN(numPart) ? 0 : numPart;
+                }
             }
             return 0;
         })
         .filter(num => num > 0)
         .sort((a, b) => a - b);
 
-    let nextNum = 1;
-    for (let i = 0; i < existingNumbers.length; i++) {
-        if (existingNumbers[i] === nextNum) {
-            nextNum++;
-        } else if (existingNumbers[i] > nextNum) {
-            break;
-        }
-    }
+    const maxNum = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
+    const nextNum = maxNum + 1;
 
     return `${targetPrefix}-${String(nextNum).padStart(3, '0')}`;
 }
