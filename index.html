@@ -2314,7 +2314,7 @@ function filterByLegalitas(jenis) {
 
 // Tambahkan fungsi di sini (sebelum penutup tag script)
 // Fungsi untuk mengubah label dan placeholder secara dinamis
-// Fungsi untuk mengubah label, placeholder, dan opsi dropdown secara dinamis
+// Fungsi untuk mengubah label, placeholder, opsi dropdown, dan kode aset secara dinamis
 function handleCategoryChange() {
   const categorySelect = document.getElementById('form-category');
   if (!categorySelect) return;
@@ -2325,15 +2325,16 @@ function handleCategoryChange() {
   const labelNoDokumen = document.getElementById('label-no-dokumen');
   const labelLuas = document.getElementById('label-luas');
   const inputNoDoc = document.getElementById('form-cert-no');
-  const selectLegality = document.getElementById('form-legality'); // Elemen dropdown legalitas
+  const selectLegality = document.getElementById('form-legality');
+  const inputKodeAset = document.getElementById('form-code'); // Sesuaikan ID input kode aset jika berbeda
 
   if (category === 'Kendaraan') {
     if (labelLegalitas) labelLegalitas.innerText = 'Kondisi / Jenis Kendaraan';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
     if (labelLuas) labelLuas.innerText = 'Tahun / Spesifikasi';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: B 1234 ABC';
+    if (inputKodeAset) inputKodeAset.value = 'KND-001';
     
-    // Opsi dropdown untuk Kendaraan
     if (selectLegality) {
       selectLegality.innerHTML = `
         <option value="Mobil Operasional">Mobil Operasional</option>
@@ -2348,8 +2349,8 @@ function handleCategoryChange() {
     if (labelNoDokumen) labelNoDokumen.innerText = 'Serial Number (S/N)';
     if (labelLuas) labelLuas.innerText = 'Tahun Pengadaan';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: SN-9912049';
+    if (inputKodeAset) inputKodeAset.value = 'ELK-001';
     
-    // Opsi dropdown untuk Elektronik
     if (selectLegality) {
       selectLegality.innerHTML = `
         <option value="Baik / Berfungsi">Baik / Berfungsi</option>
@@ -2357,13 +2358,29 @@ function handleCategoryChange() {
         <option value="Rusak / Tidak Aktif">Rusak / Tidak Aktif</option>
       `;
     }
+  } else if (category === 'Bangunan') {
+    if (labelLegalitas) labelLegalitas.innerText = 'Status Legalitas / IMB';
+    if (labelNoDokumen) labelNoDokumen.innerText = 'No. IMB / PBG / Sertifikat';
+    if (labelLuas) labelLuas.innerHTML = 'Luas Bangunan (m²) <span class="text-rose-500">*</span>';
+    if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: PBG-0123/2026';
+    if (inputKodeAset) inputKodeAset.value = 'BGN-001'; // Kode khusus Bangunan
+    
+    if (selectLegality) {
+      selectLegality.innerHTML = `
+        <option value="SHGB / IMB Lengkap">SHGB / IMB Lengkap</option>
+        <option value="PBG (Persetujuan Bangunan Gedung)">PBG (Persetujuan Bangunan Gedung)</option>
+        <option value="SHM (Sertifikat Hak Milik)">SHM (Sertifikat Hak Milik)</option>
+        <option value="Dalam Proses Perizinan">Dalam Proses Perizinan</option>
+      `;
+    }
   } else {
+    // Default untuk Tanah
     if (labelLegalitas) labelLegalitas.innerText = 'Status Legalitas';
     if (labelNoDokumen) labelNoDokumen.innerText = 'No. Sertifikat / Dokumen';
     if (labelLuas) labelLuas.innerHTML = 'Luas Area (m²) <span class="text-rose-500">*</span>';
     if (inputNoDoc) inputNoDoc.placeholder = 'SHM No. 01234/Klapanunggal';
+    if (inputKodeAset) inputKodeAset.value = 'TNH-001'; // Kode khusus Tanah
     
-    // Opsi dropdown default (Tanah/Bangunan)
     if (selectLegality) {
       selectLegality.innerHTML = `
         <option value="SHM (Sertifikat Hak Milik)">SHM (Sertifikat Hak Milik)</option>
