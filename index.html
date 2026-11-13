@@ -2314,6 +2314,7 @@ function filterByLegalitas(jenis) {
 
 // Tambahkan fungsi di sini (sebelum penutup tag script)
 // Fungsi untuk mengubah label dan placeholder secara dinamis
+// Fungsi untuk mengubah label, placeholder, dan opsi dropdown secara dinamis
 function handleCategoryChange() {
   const categorySelect = document.getElementById('form-category');
   if (!categorySelect) return;
@@ -2324,34 +2325,56 @@ function handleCategoryChange() {
   const labelNoDokumen = document.getElementById('label-no-dokumen');
   const labelLuas = document.getElementById('label-luas');
   const inputNoDoc = document.getElementById('form-cert-no');
+  const selectLegality = document.getElementById('form-legality'); // Elemen dropdown legalitas
 
   if (category === 'Kendaraan') {
     if (labelLegalitas) labelLegalitas.innerText = 'Kondisi / Jenis Kendaraan';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
     if (labelLuas) labelLuas.innerText = 'Tahun / Spesifikasi';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: B 1234 ABC';
+    
+    // Opsi dropdown untuk Kendaraan
+    if (selectLegality) {
+      selectLegality.innerHTML = `
+        <option value="Mobil Operasional">Mobil Operasional</option>
+        <option value="Motor Lapangan">Motor Lapangan</option>
+        <option value="Truk / Angkutan">Truk / Angkutan</option>
+        <option value="Alat Berat">Alat Berat</option>
+        <option value="Lainnya">Lainnya</option>
+      `;
+    }
   } else if (category === 'Elektronik') {
     if (labelLegalitas) labelLegalitas.innerText = 'Kondisi Aset';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Serial Number (S/N)';
     if (labelLuas) labelLuas.innerText = 'Tahun Pengadaan';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: SN-9912049';
+    
+    // Opsi dropdown untuk Elektronik
+    if (selectLegality) {
+      selectLegality.innerHTML = `
+        <option value="Baik / Berfungsi">Baik / Berfungsi</option>
+        <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+        <option value="Rusak / Tidak Aktif">Rusak / Tidak Aktif</option>
+      `;
+    }
   } else {
     if (labelLegalitas) labelLegalitas.innerText = 'Status Legalitas';
     if (labelNoDokumen) labelNoDokumen.innerText = 'No. Sertifikat / Dokumen';
     if (labelLuas) labelLuas.innerHTML = 'Luas Area (m²) <span class="text-rose-500">*</span>';
     if (inputNoDoc) inputNoDoc.placeholder = 'SHM No. 01234/Klapanunggal';
+    
+    // Opsi dropdown default (Tanah/Bangunan)
+    if (selectLegality) {
+      selectLegality.innerHTML = `
+        <option value="SHM (Sertifikat Hak Milik)">SHM (Sertifikat Hak Milik)</option>
+        <option value="HGB (Hak Guna Bangunan)">HGB (Hak Guna Bangunan)</option>
+        <option value="Hak Pakai">Hak Pakai</option>
+        <option value="Girik / AJB">Girik / AJB</option>
+        <option value="PPJB">PPJB</option>
+      `;
+    }
   }
 }
-
-// Pasang event listener otomatis begitu halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-  const categorySelect = document.getElementById('form-category');
-  if (categorySelect) {
-    categorySelect.addEventListener('change', handleCategoryChange);
-    // Jalankan sekali saat awal muat untuk menyesuaikan status default
-    handleCategoryChange();
-  }
-});
 </script>
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; left: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
