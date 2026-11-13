@@ -1823,14 +1823,14 @@
 
                 <!-- Legalitas & Administrasi -->
                 <div class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 text-xs">
-                    <div class="p-3 flex justify-between gap-2">
-                        <span class="text-slate-500">Status Legalitas</span>
-                        <span class="font-semibold text-slate-800 text-right">${asset.legality}</span>
-                    </div>
-                    <div class="p-3 flex justify-between gap-2">
-                        <span class="text-slate-500">Nomor Sertifikat</span>
-                        <span class="font-mono font-semibold text-blue-700 text-right">${asset.certNo || '-'}</span>
-                    </div>
+                   <div class="p-3 flex justify-between gap-2">
+                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Kepemilikan' : 'Status Legalitas'}</span>
+                                <span class="font-semibold text-slate-800 text-right">${asset.legality}</span>
+                            </div>
+                            <div class="p-3 flex justify-between gap-2">
+                                <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Plat Nomor (Nopol)' : 'Nomor Sertifikat'}</span>
+                                <span class="font-mono font-semibold text-blue-700 text-right">${asset.certNo || '-'}</span>
+                            </div>
                     <div class="p-3 flex justify-between gap-2">
                         <span class="text-slate-500">Titik Koordinat Pusat</span>
                         <span class="font-mono text-slate-700 text-right">${asset.center || '-'}</span>
