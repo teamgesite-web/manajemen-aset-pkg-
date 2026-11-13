@@ -1719,7 +1719,23 @@ document.getElementById('form-code').value = `${prefix}-${nextNum}`;
             const localBase64 = (currentFormPDF.base64 && currentFormPDF.base64.length < 3500000)
                 ? currentFormPDF.base64
                 : (existingAsset?.pdfBase64 || '');
+// --- VALIDASI CEGAH KODE KEMBAR ---
+const inputCode = document.getElementById('form-code').value.trim();
+const currentEditId = document.getElementById('form-id').value; // Mengambil ID jika sedang mode edit
 
+// Cek apakah kode sudah dipakai oleh aset lain
+const isDuplicate = assets.some(item => {
+    const existingCode = (item.code || '').trim().toUpperCase();
+    const isSame = existingCode === inputCode.toUpperCase();
+    const isNotSelf = String(item.id) !== String(currentEditId); // Abaikan jika sedang edit aset miliknya sendiri
+    return isSame && isNotSelf;
+});
+
+if (isDuplicate) {
+    alert(`Peringatan: Kode aset "${inputCode}" sudah terdaftar! Gunakan kode yang berbeda.`);
+    return; // Batalkan proses simpan
+}
+// ---------------------------------
             const assetData = {
                 id: existingId || 'apk-' + Date.now(),
                 code: document.getElementById('form-code').value.trim(),
