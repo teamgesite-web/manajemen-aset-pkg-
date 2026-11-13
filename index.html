@@ -1831,9 +1831,9 @@
                                 <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Plat Nomor (Nopol)' : 'Nomor Sertifikat'}</span>
                                 <span class="font-mono font-semibold text-blue-700 text-right">${asset.certNo || '-'}</span>
                             </div>
-                    <div class="p-3 flex justify-between gap-2">
+                   <div class="p-3 flex justify-between gap-2">
                                 <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Kondisi Kendaraan' : 'Titik Koordinat Pusat'}</span>
-                                <span class="font-mono font-semibold text-slate-700 text-right">${asset.category === 'Kendaraan' ? (asset.status || 'Baik') : (asset.center || '-')}</span>
+                                <span class="font-mono font-semibold text-slate-700 text-right">${asset.category === 'Kendaraan' ? 'Baik / Operasional' : (asset.center || '-')}</span>
                             </div>
                             <div class="p-3 flex justify-between gap-2">
                                 <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Jenis / Kategori' : 'Poligon Spasial KML'}</span>
