@@ -2517,6 +2517,18 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     }
   }
 }
+	// --- FUNGSI SALIN TEKS CEPAT ---
+function salinTeks(teks) {
+    navigator.clipboard.writeText(teks).then(() => {
+        if (typeof showToast === 'function') {
+            showToast(`Berhasil menyalin: ${teks}`, 'success');
+        } else {
+            alert(`Berhasil menyalin: ${teks}`);
+        }
+    }).catch(err => {
+        console.error('Gagal menyalin teks: ', err);
+    });
+}
 </script>
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; left: 10px; background: #fff; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
