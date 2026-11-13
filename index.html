@@ -2575,19 +2575,19 @@ function filterKategori(kategori) {
         console.log("Data difilter:", filtered);
     }
 }
-	// --- AUTO-GENERATE KODE SAAT HALAMAN PERTAMA KALI DIBUKA ---
+	// --- PAKSA UPDATE KODE ASET SAAT HALAMAN DIBUKA ---
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
-        if (typeof handleCategoryChange === 'function') {
+        const catEl = document.getElementById('form-category') || document.getElementById('kategori');
+        const codeEl = document.getElementById('form-code') || document.getElementById('kode');
+        
+        if (catEl && codeEl && typeof generateNextAssetCode === 'function') {
+            const newCode = generateNextAssetCode(catEl.value);
+            codeEl.value = newCode; // Memaksa menimpa nilai TNH-055
+        } else if (typeof handleCategoryChange === 'function') {
             handleCategoryChange();
-        } else {
-            const catEl = document.getElementById('form-category') || document.getElementById('kategori');
-            const codeEl = document.getElementById('form-code') || document.getElementById('kode');
-            if (catEl && codeEl && typeof generateNextAssetCode === 'function') {
-                codeEl.value = generateNextAssetCode(catEl.value);
-            }
         }
-    }, 500);
+    }, 600);
 });
 </script>
 </body>
