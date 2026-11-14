@@ -2594,7 +2594,52 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 });
+
+// Fungsi untuk Membuka Modal Pratinjau PDF
+function openPdfModal(url, title) {
+    const modal = document.getElementById('pdf-modal');
+    const iframe = document.getElementById('pdf-iframe');
+    const titleEl = document.getElementById('pdf-modal-title');
+    
+    if (modal && iframe) {
+        iframe.src = url;
+        if (titleEl) titleEl.textContent = title || 'Pratinjau Dokumen Legalitas';
+        modal.classList.remove('hidden');
+    }
+}
+
+// Fungsi untuk Menutup Modal PDF
+function closePdfModal() {
+    const modal = document.getElementById('pdf-modal');
+    const iframe = document.getElementById('pdf-iframe');
+    if (modal && iframe) {
+        iframe.src = '';
+        modal.classList.add('hidden');
+    }
+}
+
+// Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
+function focusAssetOnMap(lat, lng, assetCode) {
+    if (typeof map !== 'undefined' && lat && lng) {
+        map.flyTo([lat, lng], 19, { animate: true, duration: 1.5 });
+    }
+    console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
+}
 </script>
+
+<!-- Modal Pratinjau Dokumen PDF -->
+<div id="pdf-modal" class="fixed inset-0 z-[99999] hidden bg-black/70 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-4xl h-[85vh] rounded-xl flex flex-col overflow-hidden shadow-2xl">
+        <div class="px-4 py-3 bg-slate-800 text-white flex justify-between items-center">
+            <h3 id="pdf-modal-title" class="font-semibold text-sm">Pratinjau Dokumen Legalitas</h3>
+            <button onclick="closePdfModal()" class="text-slate-300 hover:text-white text-lg font-bold px-2">&times;</button>
+        </div>
+        <div class="flex-1 bg-slate-100 p-2">
+            <iframe id="pdf-iframe" src="" class="w-full h-full rounded border border-slate-300" frameborder="0"></iframe>
+        </div>
+    </div>
+</div>
+
 </body>
 <div id="firebase-status" style="position: fixed; bottom: 10px; right: 10px; background: #fff; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 10px; z-index: 9999; color: #666; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Status Firebase: Siap</div>
 </html>
