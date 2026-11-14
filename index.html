@@ -2461,8 +2461,15 @@ function generateNextAssetCode(prefix) {
         .filter(num => num > 0)
         .sort((a, b) => a - b);
 
-    const maxNum = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
-    const nextNum = maxNum + 1;
+    // Cari celah angka terkecil yang kosong (misal: 1, 2, [kosong], 4 -> ambil 3)
+    let nextNum = 1;
+    for (let i = 0; i < existingNumbers.length; i++) {
+        if (existingNumbers[i] === nextNum) {
+            nextNum++;
+        } else if (existingNumbers[i] > nextNum) {
+            break;
+        }
+    }
 
     return `${targetPrefix}-${String(nextNum).padStart(3, '0')}`;
 }
