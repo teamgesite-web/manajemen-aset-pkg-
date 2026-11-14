@@ -250,20 +250,22 @@
         <button onclick="filterKategori('Jalan')" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-medium transition">Jalan</button>
     </div>
 
-    <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-100 sticky top-0 z-10 border-b border-slate-200 text-[10px] font-semibold text-slate-600 uppercase tracking-wider">
-                        <tr>
-                            <th class="py-2 px-2">Kode</th>
-                            <th class="py-2 px-2">Atas Nama &amp; Lokasi</th>
-                            <th id="th-luas-label" class="py-2 px-2 text-right">Luas (m²)</th>
-                            <th class="py-2 px-2">Status</th>
-                            <th class="py-2 px-1.5 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="asset-table-body" class="divide-y divide-slate-100 text-[11px]">
-                        <!-- Rows rendered dynamically by JS -->
-                    </tbody>
-                </table>
+    <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse min-w-[500px]">
+        <thead class="bg-slate-100 sticky top-0 z-10 border-b border-slate-200 text-[10px] font-semibold text-slate-600 uppercase tracking-wider">
+            <tr>
+                <th class="py-2 px-2">Kode</th>
+                <th class="py-2 px-2">Atas Nama &amp; Lokasi</th>
+                <th id="th-luas-label" class="py-2 px-2 text-right">Luas (m²)</th>
+                <th class="py-2 px-2">Status</th>
+                <th class="py-2 px-1.5 text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="asset-table-body" class="divide-y divide-slate-100 text-[11px]">
+            <!-- Rows rendered dynamically by JS -->
+        </tbody>
+    </table>
+</div>
                 
                 <!-- Empty State -->
                 <div id="empty-state" class="hidden flex-col items-center justify-center py-10 px-4 text-center">
