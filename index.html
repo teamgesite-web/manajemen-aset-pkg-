@@ -1495,22 +1495,22 @@ const categoryEl = document.getElementById('form-category');
             document.getElementById('asset-form-modal').classList.add('flex');
         }
 
-        function openEditAssetModal(assetId) {
+       function openEditAssetModal(assetId) {
     if (!isAdmin) return;
     const asset = assets.find(a => a.id === assetId);
     if (!asset) return;
 
-    clearSelectedPDF();
+    clearSelectedPDFUI();
     document.getElementById('form-id').value = asset.id;
-    document.getElementById('modal-form-title').textContent = `Edit Aset — ${asset.code}`;
-    
+    document.getElementById('modal-form-title').textContent = `Edit Aset - ${asset.code}`;
+
     // Data dasar & atribut kendaraan
     document.getElementById('form-code').value = asset.code;
     document.getElementById('form-name').value = asset.name;
     document.getElementById('form-merk').value = asset.merk || '';
     document.getElementById('form-model').value = asset.model || '';
     document.getElementById('form-category').value = asset.category || 'Tanah';
-    
+
     // Atribut spesifik kendaraan (pastikan ID elemen form sesuai)
     if (document.getElementById('form-tahun-pembuatan')) document.getElementById('form-tahun-pembuatan').value = asset.tahunPembuatan || '';
     if (document.getElementById('form-warna')) document.getElementById('form-warna').value = asset.warna || '';
@@ -1546,10 +1546,14 @@ const categoryEl = document.getElementById('form-category');
         ? `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon aktif (${asset.polygon.length} titik koordinat).</span>`
         : `<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span class="text-amber-700">Belum ada poligon terpasang.</span>`;
 
+    document.getElementById('asset-form-modal').classList.remove('hidden');
+    document.getElementById('asset-form-modal').classList.add('flex');
+
     // Panggil handler kategori agar form atribut kendaraan muncul
     if (typeof handleCategoryChange === 'function') {
         handleCategoryChange();
     }
+}
 
     // KUNCI: Paksa kembalikan kode aset ke nilai aslinya agar tidak berubah jadi KND-002
    document.getElementById('form-code').value = asset.code;
@@ -1564,14 +1568,15 @@ const categoryEl = document.getElementById('form-category');
             base64: asset.pdfBase64 || '',
             blobUrl: asset.pdfBase64 ? base64ToBlobUrl(asset.pdfBase64) : ''
         };
+		document.getElementById('polygon-parse-status').innerHTML = asset.polygon && asset.polygon.length >= 3
+                ? `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon aktif (${asset.polygon.length} titik koordinat).</span>`
+                : `<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span class="text-amber-700">Belum ada poligon terpasang.</span>`;
         updateSelectedPDFUI();
     }
 }
 
 
-            document.getElementById('polygon-parse-status').innerHTML = asset.polygon && asset.polygon.length >= 3
-                ? `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon aktif (${asset.polygon.length} titik koordinat).</span>`
-                : `<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span class="text-amber-700">Belum ada poligon terpasang.</span>`;
+            
 
             document.getElementById('asset-form-modal').classList.remove('hidden');
             document.getElementById('asset-form-modal').classList.add('flex');
