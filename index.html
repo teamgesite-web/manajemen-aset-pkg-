@@ -1789,20 +1789,32 @@ if (isDuplicate) {
             }
         }
 
-        function deleteAsset(assetId) {
-            if (!isAdmin) return;
-            const asset = assets.find(a => a.id === assetId);
-            if (!asset) return;
+       function deleteAsset(assetId) {
+    if (!isAdmin) return;
+    const asset = assets.find(a => a.id === assetId);
+    if (!asset) return;
 
-            assets = assets.filter(a => a.id !== assetId);
-            saveAssetsToStorage();
-            if (selectedAssetId === assetId) {
-                selectedAssetId = null;
-                closeDetailDrawer();
-            }
-            renderAll();
-            showToast(`Aset ${asset.code} telah dihapus.`, 'info');
-        }
+    // --- TAMBAHKAN PERINTAH HAPUS FIREBASE DI SINI ---
+    if (typeof firebase !== 'undefined' && firebase.database) {
+        firebase.database().ref('peta_aset/' + assetId).remove()
+            .then(() => {
+                console.log("Data berhasil dihapus permanen dari Firebase");
+            })
+            .catch((error) => {
+                console.error("Gagal menghapus dari Firebase:", error);
+            });
+    }
+    // ------------------------------------------------
+
+    assets = assets.filter(a => a.id !== assetId);
+    saveAssetsToStorage();
+    if (selectedAssetId === assetId) {
+        selectedAssetId = null;
+        closeDetailDrawer();
+    }
+    renderAll();
+    showToast(`Aset ${asset.code} telah dihapus.`, 'info');
+}
 
         function openAssetDetail(assetId) {
             const asset = assets.find(a => a.id === assetId);
