@@ -1747,6 +1747,8 @@ if (isDuplicate) {
                 id: existingId || 'apk-' + Date.now(),
                 code: document.getElementById('form-code').value.trim(),
                 name: document.getElementById('form-name').value.trim(),
+				merk: document.getElementById('form-merk') ? document.getElementById('form-merk').value.trim() : '',
+    model: document.getElementById('form-model') ? document.getElementById('form-model').value.trim() : '',
                 category: document.getElementById('form-category').value,
                 legality: document.getElementById('form-legality').value,
                 certNo: document.getElementById('form-cert-no').value.trim(),
