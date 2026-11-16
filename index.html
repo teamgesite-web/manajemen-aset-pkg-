@@ -1507,7 +1507,7 @@ const categoryEl = document.getElementById('form-category');
             document.getElementById('form-name').value = asset.name;
 			document.getElementById('form-merk').value = asset.merk || '';
     document.getElementById('form-model').value = asset.model || '';
-            document.getElementById('form-category').value = asset.category === 'Bangunan' ? 'Bangunan' : 'Tanah';
+           document.getElementById('form-category').value = asset.category || 'Tanah';
             document.getElementById('form-legality').value = asset.legality;
             document.getElementById('form-cert-no').value = asset.certNo || '';
             document.getElementById('form-area').value = asset.area;
