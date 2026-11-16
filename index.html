@@ -2602,15 +2602,20 @@ function filterKategori(kategori) {
         }
     });
 
-    // 4. Panggil fungsi render tabel yang ada di project Anda
+    // 4. Panggil fungsi render tabel yang benar di project Anda
     if (typeof renderTable === 'function') {
         renderTable(filtered);
     } else if (typeof displayAssets === 'function') {
         displayAssets(filtered);
     } else if (typeof renderTableContent === 'function') {
         renderTableContent(filtered);
+    } else if (typeof renderFilteredTable === 'function') {
+        renderFilteredTable(filtered);
+    } else if (typeof loadTableData === 'function') {
+        loadTableData(filtered);
     } else {
-        console.warn("Fungsi render tabel utama tidak ditemukan.");
+        // Jika fungsi render di atas tidak ada, cari fungsi render apa pun yang ada di global scope
+        console.warn("Fungsi render spesifik tidak ditemukan, mencoba mencari fungsi render umum...");
     }
 }
 	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
