@@ -2574,18 +2574,43 @@ function salinTeks(teks) {
 }
 	// --- FUNGSI FILTER KATEGORI ---
 function filterKategori(kategori) {
-    const dataToFilter = window.allAssets || assets || [];
-    
+    console.log("Filter diklik:", kategori);
+
+    // 1. Ambil data utama
+    const dataToFilter = window.allAssets || (typeof assets !== 'undefined' ? assets : []);
+
+    // 2. Filter data berdasarkan kategori
     const filtered = kategori === 'Semua' 
         ? dataToFilter 
-        : dataToFilter.filter(item => (item.category || item.kategori) === kategori);
-    
+        : dataToFilter.filter(item => {
+            const cat = item.category || item.kategori || '';
+            return cat.trim().toLowerCase() === kategori.trim().toLowerCase();
+        });
+
+    console.log("Data difilter:", filtered);
+
+    // 3. Perbarui warna tombol secara visual agar tombol yang aktif terlihat jelas
+    const buttons = document.querySelectorAll('button[onclick*="filterKategori"]');
+    buttons.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        if (onclickAttr.includes(`('${kategori}')`)) {
+            btn.classList.remove('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+            btn.classList.add('bg-blue-600', 'text-white');
+        } else {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+        }
+    });
+
+    // 4. Panggil fungsi render tabel yang ada di project Anda
     if (typeof renderTable === 'function') {
         renderTable(filtered);
     } else if (typeof displayAssets === 'function') {
         displayAssets(filtered);
+    } else if (typeof renderTableContent === 'function') {
+        renderTableContent(filtered);
     } else {
-        console.log("Data difilter:", filtered);
+        console.warn("Fungsi render tabel utama tidak ditemukan.");
     }
 }
 	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
