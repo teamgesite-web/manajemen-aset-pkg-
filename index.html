@@ -2564,47 +2564,7 @@ function salinTeks(teks) {
         console.error('Gagal menyalin teks: ', err);
     });
 }
-	// --- FUNGSI FILTER KATEGORI (FIX PENCARIAN DATA) ---
-function filterKategori(kategori) {
-    console.log("Filter diklik:", kategori);
-
-    // 1. Ambil data utama
-    const dataToFilter = window.allAssets || (typeof assets !== 'undefined' ? assets : []);
-
-    // 2. Filter data berdasarkan kategori dengan pengecekan yang lebih fleksibel
-    const filtered = kategori === 'Semua' 
-        ? dataToFilter 
-        : dataToFilter.filter(item => {
-            // Ambil kategori dari berbagai kemungkinan nama properti data
-            const cat = (item.category || item.kategori || '').trim().toLowerCase();
-            const target = kategori.trim().toLowerCase();
-            return cat === target;
-        });
-
-    console.log("Data difilter untuk " + kategori + ":", filtered.length, "item", filtered);
-
-    // 3. Perbarui warna tombol secara visual agar tombol yang aktif menjadi biru
-    const buttons = document.querySelectorAll('button[onclick*="filterKategori"]');
-    buttons.forEach(btn => {
-        const onclickAttr = btn.getAttribute('onclick') || '';
-        if (onclickAttr.includes(`('${kategori}')`)) {
-            btn.classList.remove('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
-            btn.classList.add('bg-blue-600', 'text-white');
-        } else {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
-        }
-    });
-
-    // 4. Panggil fungsi render tabel yang ada di project Anda
-    if (typeof renderTable === 'function') {
-        renderTable(filtered);
-    } else if (typeof displayAssets === 'function') {
-        displayAssets(filtered);
-    } else if (typeof renderTableContent === 'function') {
-        renderTableContent(filtered);
-    }
-}
+	
 	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
 window.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
