@@ -1496,29 +1496,67 @@ const categoryEl = document.getElementById('form-category');
         }
 
         function openEditAssetModal(assetId) {
-            if (!isAdmin) return;
-            const asset = assets.find(a => a.id === assetId);
-            if (!asset) return;
+    if (!isAdmin) return;
+    const asset = assets.find(a => a.id === assetId);
+    if (!asset) return;
 
-            clearSelectedPDF();
-            document.getElementById('form-id').value = asset.id;
-            document.getElementById('modal-form-title').textContent = `Edit Aset — ${asset.code}`;
-            document.getElementById('form-code').value = asset.code;
-            document.getElementById('form-name').value = asset.name;
-			document.getElementById('form-merk').value = asset.merk || '';
+    clearSelectedPDF();
+    document.getElementById('form-id').value = asset.id;
+    document.getElementById('modal-form-title').textContent = `Edit Aset — ${asset.code}`;
+    
+    // Data dasar & atribut kendaraan
+    document.getElementById('form-code').value = asset.code;
+    document.getElementById('form-name').value = asset.name;
+    document.getElementById('form-merk').value = asset.merk || '';
     document.getElementById('form-model').value = asset.model || '';
-           document.getElementById('form-category').value = asset.category || 'Tanah';
-            document.getElementById('form-legality').value = asset.legality;
-            document.getElementById('form-cert-no').value = asset.certNo || '';
-            document.getElementById('form-area').value = asset.area;
-            document.getElementById('form-status').value = asset.status || '';
-            document.getElementById('form-location').value = asset.location;
-            document.getElementById('form-center').value = asset.center || '';
-            document.getElementById('form-date').value = asset.date || '';
-            document.getElementById('form-pdf-drive-url').value = asset.pdfDriveUrl || '';
-            document.getElementById('form-notes').value = asset.notes || '';
-            document.getElementById('form-polygon-coords').value = asset.polygon ? JSON.stringify(asset.polygon) : '';
+    document.getElementById('form-category').value = asset.category || 'Tanah';
+    
+    // Atribut spesifik kendaraan (pastikan ID elemen form sesuai)
+    if (document.getElementById('form-tahun-pembuatan')) document.getElementById('form-tahun-pembuatan').value = asset.tahunPembuatan || '';
+    if (document.getElementById('form-warna')) document.getElementById('form-warna').value = asset.warna || '';
+    if (document.getElementById('form-cc')) document.getElementById('form-cc').value = asset.cc || '';
+    if (document.getElementById('form-no-rangka')) document.getElementById('form-no-rangka').value = asset.noRangka || '';
+    if (document.getElementById('form-no-mesin')) document.getElementById('form-no-mesin').value = asset.noMesin || '';
+    if (document.getElementById('form-pemegang')) document.getElementById('form-pemegang').value = asset.pemegang || '';
+    if (document.getElementById('form-bpkb')) document.getElementById('form-bpkb').value = asset.bpkb || '';
 
+    // Data form lainnya
+    document.getElementById('form-legality').value = asset.legality;
+    document.getElementById('form-cert-no').value = asset.certNo || '';
+    document.getElementById('form-area').value = asset.area;
+    document.getElementById('form-status').value = asset.status || '';
+    document.getElementById('form-location').value = asset.location;
+    document.getElementById('form-center').value = asset.center || '';
+    document.getElementById('form-date').value = asset.date || '';
+    document.getElementById('form-pdf-drive-url').value = asset.pdfDriveUrl || '';
+    document.getElementById('form-notes').value = asset.notes || '';
+    document.getElementById('form-polygon-coords').value = asset.polygon ? JSON.stringify(asset.polygon) : '';
+
+    if (asset.pdfFileName || asset.pdfBase64) {
+        currentFormPDF = {
+            fileName: asset.pdfFileName || 'Dokumen_Legalitas.pdf',
+            fileSize: asset.pdfFileSize || 0,
+            base64: asset.pdfBase64 || '',
+            blobUrl: asset.pdfBase64 ? base64ToBlobUrl(asset.pdfBase64) : ''
+        };
+        updateSelectedPDFUI();
+    }
+
+    document.getElementById('polygon-parse-status').innerHTML = asset.polygon && asset.polygon.length >= 3
+        ? `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon aktif (${asset.polygon.length} titik koordinat).</span>`
+        : `<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span class="text-amber-700">Belum ada poligon terpasang.</span>`;
+
+    // Panggil handler kategori agar form atribut kendaraan muncul
+    if (typeof handleCategoryChange === 'function') {
+        handleCategoryChange();
+    }
+
+    // KUNCI: Paksa kembalikan kode aset ke nilai aslinya agar tidak berubah jadi KND-002
+    document.getElementById('form-code').value = asset.code;
+
+    document.getElementById('asset-form-modal').classList.remove('hidden');
+    document.getElementById('asset-form-modal').classList.add('flex');
+}
             if (asset.pdfFileName || asset.pdfBase64) {
                 currentFormPDF = {
                     fileName: asset.pdfFileName || 'Dokumen_Legalitas.pdf',
