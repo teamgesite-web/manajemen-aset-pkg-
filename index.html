@@ -2572,24 +2572,26 @@ function salinTeks(teks) {
         console.error('Gagal menyalin teks: ', err);
     });
 }
-	// --- FUNGSI FILTER KATEGORI (DIRECT RENDER FINAL) ---
+	// --- FUNGSI FILTER KATEGORI (FIX PENCARIAN DATA) ---
 function filterKategori(kategori) {
     console.log("Filter diklik:", kategori);
 
     // 1. Ambil data utama
     const dataToFilter = window.allAssets || (typeof assets !== 'undefined' ? assets : []);
 
-    // 2. Filter data berdasarkan kategori
+    // 2. Filter data berdasarkan kategori dengan pengecekan yang lebih fleksibel
     const filtered = kategori === 'Semua' 
         ? dataToFilter 
         : dataToFilter.filter(item => {
-            const cat = item.category || item.kategori || '';
-            return cat.trim().toLowerCase() === kategori.trim().toLowerCase();
+            // Ambil kategori dari berbagai kemungkinan nama properti data
+            const cat = (item.category || item.kategori || '').trim().toLowerCase();
+            const target = kategori.trim().toLowerCase();
+            return cat === target;
         });
 
-    console.log("Data difilter:", filtered);
+    console.log("Data difilter untuk " + kategori + ":", filtered.length, "item", filtered);
 
-    // 3. Perbarui warna tombol secara visual agar tombol yang aktif terlihat biru
+    // 3. Perbarui warna tombol secara visual agar tombol yang aktif menjadi biru
     const buttons = document.querySelectorAll('button[onclick*="filterKategori"]');
     buttons.forEach(btn => {
         const onclickAttr = btn.getAttribute('onclick') || '';
@@ -2602,19 +2604,13 @@ function filterKategori(kategori) {
         }
     });
 
-    // 4. Cari fungsi render yang mungkin ada di script Anda, 
-    // jika tidak ada, panggil fungsi pembawa data asli milik aplikasi Anda
+    // 4. Panggil fungsi render tabel yang ada di project Anda
     if (typeof renderTable === 'function') {
         renderTable(filtered);
     } else if (typeof displayAssets === 'function') {
         displayAssets(filtered);
     } else if (typeof renderTableContent === 'function') {
         renderTableContent(filtered);
-    } else {
-        // Jika fungsi render tidak ditemukan, kita cari elemen penampung tabel dan perbarui datanya secara otomatis
-        window.currentFilteredAssets = filtered;
-        // Coba panggil fungsi global apa pun yang memuat ulang tabel
-        if (typeof loadAssets === 'function') loadAssets();
     }
 }
 	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
