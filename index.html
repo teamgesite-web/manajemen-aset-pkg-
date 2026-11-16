@@ -1535,6 +1535,9 @@ const categoryEl = document.getElementById('form-category');
 
             document.getElementById('asset-form-modal').classList.remove('hidden');
             document.getElementById('asset-form-modal').classList.add('flex');
+			if (typeof handleCategoryChange === 'function') {
+        handleCategoryChange();
+    }
         }
 
         function closeAssetFormModal() {
