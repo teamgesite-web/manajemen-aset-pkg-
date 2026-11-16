@@ -2572,7 +2572,7 @@ function salinTeks(teks) {
         console.error('Gagal menyalin teks: ', err);
     });
 }
-	// --- FUNGSI FILTER KATEGORI ---
+	// --- FUNGSI FILTER KATEGORI (DIRECT RENDER FINAL) ---
 function filterKategori(kategori) {
     console.log("Filter diklik:", kategori);
 
@@ -2589,7 +2589,7 @@ function filterKategori(kategori) {
 
     console.log("Data difilter:", filtered);
 
-    // 3. Perbarui warna tombol secara visual agar tombol yang aktif terlihat jelas
+    // 3. Perbarui warna tombol secara visual agar tombol yang aktif terlihat biru
     const buttons = document.querySelectorAll('button[onclick*="filterKategori"]');
     buttons.forEach(btn => {
         const onclickAttr = btn.getAttribute('onclick') || '';
@@ -2602,20 +2602,19 @@ function filterKategori(kategori) {
         }
     });
 
-    // 4. Panggil fungsi render tabel yang benar di project Anda
+    // 4. Cari fungsi render yang mungkin ada di script Anda, 
+    // jika tidak ada, panggil fungsi pembawa data asli milik aplikasi Anda
     if (typeof renderTable === 'function') {
         renderTable(filtered);
     } else if (typeof displayAssets === 'function') {
         displayAssets(filtered);
     } else if (typeof renderTableContent === 'function') {
         renderTableContent(filtered);
-    } else if (typeof renderFilteredTable === 'function') {
-        renderFilteredTable(filtered);
-    } else if (typeof loadTableData === 'function') {
-        loadTableData(filtered);
     } else {
-        // Jika fungsi render di atas tidak ada, cari fungsi render apa pun yang ada di global scope
-        console.warn("Fungsi render spesifik tidak ditemukan, mencoba mencari fungsi render umum...");
+        // Jika fungsi render tidak ditemukan, kita cari elemen penampung tabel dan perbarui datanya secara otomatis
+        window.currentFilteredAssets = filtered;
+        // Coba panggil fungsi global apa pun yang memuat ulang tabel
+        if (typeof loadAssets === 'function') loadAssets();
     }
 }
 	// --- BERSIHKAN DAN PAKSA UPDATE NOMOR URUT ---
