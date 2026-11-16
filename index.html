@@ -1552,20 +1552,22 @@ const categoryEl = document.getElementById('form-category');
     }
 
     // KUNCI: Paksa kembalikan kode aset ke nilai aslinya agar tidak berubah jadi KND-002
-    document.getElementById('form-code').value = asset.code;
+   document.getElementById('form-code').value = asset.code;
 
     document.getElementById('asset-form-modal').classList.remove('hidden');
     document.getElementById('asset-form-modal').classList.add('flex');
+
+    if (asset.pdfFileName || asset.pdfBase64) {
+        currentFormPDF = {
+            fileName: asset.pdfFileName || 'Dokumen_Legalitas.pdf',
+            fileSize: asset.pdfFileSize || 0,
+            base64: asset.pdfBase64 || '',
+            blobUrl: asset.pdfBase64 ? base64ToBlobUrl(asset.pdfBase64) : ''
+        };
+        updateSelectedPDFUI();
+    }
 }
-            if (asset.pdfFileName || asset.pdfBase64) {
-                currentFormPDF = {
-                    fileName: asset.pdfFileName || 'Dokumen_Legalitas.pdf',
-                    fileSize: asset.pdfFileSize || 0,
-                    base64: asset.pdfBase64 || '',
-                    blobUrl: asset.pdfBase64 ? base64ToBlobUrl(asset.pdfBase64) : ''
-                };
-                updateSelectedPDFUI();
-            }
+
 
             document.getElementById('polygon-parse-status').innerHTML = asset.polygon && asset.polygon.length >= 3
                 ? `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon aktif (${asset.polygon.length} titik koordinat).</span>`
