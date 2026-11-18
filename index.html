@@ -78,12 +78,35 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
         }
         @keyframes pulse-border {
-            0%, 100% { border-color: rgba(59, 130, 246, 0.85); }
-            50% { border-color: rgba(16, 185, 129, 0.95); }
-        }
-        .drawing-active-banner {
-            animation: pulse-border 2s infinite;
-        }
+    0%, 100% { border-color: rgba(59, 130, 246, 0.85); }
+    50% { border-color: rgba(16, 185, 129, 0.95); }
+}
+.drawing-active-banner {
+    animation: pulse-border 2s infinite;
+}
+
+/* ====== TAMPILAN HP (tempel di sini) ====== */
+@media (max-width: 767px) {
+    /* Angka kartu KPI lebih kecil di HP */
+    #kpi-total-assets, #kpi-total-area, #kpi-tanah-count,
+    #kpi-bangunan-count, #kpi-kendaraan-count, #kpi-certified {
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    /* Angka kartu legalitas lebih kecil di HP */
+    #count-shgb, #count-shm, #count-girik, #count-ajb {
+        font-size: 1.15rem;
+    }
+
+    /* Peta wajib punya tinggi di HP */
+    #map {
+        height: 60vh !important;
+        min-height: 320px;
+    }
+}
+</style>
+</head>
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen overflow-y-auto md:h-screen md:overflow-hidden">
