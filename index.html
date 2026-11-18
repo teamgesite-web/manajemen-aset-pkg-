@@ -2672,30 +2672,43 @@ function focusAssetOnMap(lat, lng, assetCode) {
     console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
 }
 	// Fungsi Rekapitulasi Legalitas Tanah
-function updateLandLegalSummary(assets) {
+function updateLandLegalSummary(assetsData) {
+    // Otomatis cari variabel data global jika parameter kosong
+    const rawData = assetsData || window.allAssets || window.assets || window.dataAset || [];
+    const assetsArray = Array.isArray(rawData) ? rawData : Object.values(rawData);
+    
     let shgb = 0, shm = 0, girik = 0, ajb = 0;
     
-    if (!assets || !Array.isArray(assets)) return;
+    if (assetsArray.length === 0) return;
     
-    assets.forEach(asset => {
-        // Cek kategori dengan fleksibel (menghindari masalah huruf besar/kecil)
-        const cat = (asset.category || asset.kategori || '').toString().toLowerCase();
+    assetsArray.forEach(asset => {
+        // Ubah data objek menjadi teks agar langsung terbaca tanpa peduli nama kolomnya
+        const assetString = JSON.stringify(asset).toUpperCase();
         
-        if (cat.includes('tanah')) {
-            // Ambil teks legalitas dari berbagai kemungkinan nama properti data
-            const legal = (asset.legalitas || asset.statusLegalitas || asset.certType || asset['Status Legalitas'] || '').toString().toUpperCase();
-            
-            if (legal.includes('HGB')) {
+        if (assetString.includes('TANAH')) {
+            if (assetString.includes('HGB') || assetString.includes('GUNA BANGUNAN')) {
                 shgb++;
-            } else if (legal.includes('SHM') || legal.includes('HAK MILIK')) {
+            } else if (assetString.includes('SHM') || assetString.includes('HAK MILIK')) {
                 shm++;
-            } else if (legal.includes('GIRIK')) {
+            } else if (assetString.includes('GIRIK')) {
                 girik++;
-            } else if (legal.includes('AJB')) {
+            } else if (assetString.includes('AJB')) {
                 ajb++;
             }
         }
     });
+
+    // Masukkan hasil ke elemen kartu HTML
+    const elShgb = document.getElementById('count-shgb');
+    const elShm = document.getElementById('count-shm');
+    const elGirik = document.getElementById('count-girik');
+    const elAjb = document.getElementById('count-ajb');
+
+    if (elShgb) elShgb.innerText = `${shgb} Bidang`;
+    if (elShm) elShm.innerText = `${shm} Bidang`;
+    if (elGirik) elGirik.innerText = `${girik} Bidang`;
+    if (elAjb) elAjb.innerText = `${ajb} Bidang`;
+}
 
     // Masukkan hasil hitung ke elemen HTML kartu di dashboard
     const elShgb = document.getElementById('count-shgb');
