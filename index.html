@@ -2720,7 +2720,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (elAjb) elAjb.innerText = `${ajb} Bidang`;
 }
 
-    // Fungsi Rekapitulasi Legalitas Tanah
+   // Fungsi Rekapitulasi Legalitas Tanah
 function updateLandLegalSummary(assetsData) {
     const rawData = assetsData || window.allAssets || window.assets || window.dataAset || [];
     const assetsArray = Array.isArray(rawData) ? rawData : Object.values(rawData);
@@ -2745,7 +2745,6 @@ function updateLandLegalSummary(assetsData) {
         }
     });
 
-    // Masukkan hasil hitung ke elemen HTML kartu di dashboard
     const elShgb = document.getElementById('count-shgb');
     const elShm = document.getElementById('count-shm');
     const elGirik = document.getElementById('count-girik');
@@ -2756,15 +2755,6 @@ function updateLandLegalSummary(assetsData) {
     if (elGirik) elGirik.innerText = `${girik} Bidang`;
     if (elAjb) elAjb.innerText = `${ajb} Bidang`;
 }
-
-// Panggil otomatis saat halaman dimuat
-document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(() => {
-        if (typeof updateLandLegalSummary === 'function') {
-            updateLandLegalSummary();
-        }
-    }, 1000);
-});
 
 // Panggil otomatis saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function() {
