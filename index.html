@@ -2107,7 +2107,7 @@ ${asset.category === 'Kendaraan' ? (asset.merk || asset.merk_type || asset.merkT
 </td>
                        <td class="py-2 px-2 align-top">
     <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${asset.category === 'Kendaraan' ? 'bg-blue-50 text-blue-700 border border-blue-200/80 font-mono' : 'bg-amber-50 text-amber-800 border border-amber-200/80'} leading-tight max-w-[95px] truncate" title="${asset.category === 'Kendaraan' ? (asset.certNo || '-') : (asset.status || '-')}">
-     ${asset.category === 'Kendaraan' ? (asset.nopol || '-') : (asset.status || '-')}
+     ${JSON.stringify(asset)}
     </span>
 </td>
                         </td>
