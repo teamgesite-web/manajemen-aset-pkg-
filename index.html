@@ -2704,12 +2704,7 @@ function updateLandLegalSummary(assets) {
     if (elGirik) elGirik.innerText = `${girik} Bidang`;
     if (elAjb) elAjb.innerText = `${ajb} Bidang`;
 }
-	// Perbarui rekapitulasi otomatis setelah data siap
-setTimeout(function() {
-    if (typeof allAssets !== 'undefined') {
-        updateLandLegalSummary(allAssets);
-    }
-}, 1000);
+	window.updateLandLegalSummary = updateLandLegalSummary;
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
