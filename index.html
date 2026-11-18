@@ -2714,16 +2714,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 1000);
 });
 </script>
-// Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
-function focusAssetOnMap(lat, lng, assetCode) {
-    if (typeof map !== 'undefined' && lat && lng) {
-        map.flyTo([lat, lng], 19, { animate: true, duration: 1.5 });
-    }
-    console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
-}
-}
-} 
-</script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
 <div id="pdf-modal" class="fixed inset-0 z-[99999] hidden bg-black/70 flex items-center justify-center p-4">
