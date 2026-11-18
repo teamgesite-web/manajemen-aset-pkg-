@@ -2720,50 +2720,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (elAjb) elAjb.innerText = `${ajb} Bidang`;
 }
 
-   // Fungsi Rekapitulasi Legalitas Tanah
-function updateLandLegalSummary(assetsData) {
-    const rawData = assetsData || window.allAssets || window.assets || window.dataAset || [];
-    const assetsArray = Array.isArray(rawData) ? rawData : Object.values(rawData);
-    
-    let shgb = 0, shm = 0, girik = 0, ajb = 0;
-    
-    if (assetsArray.length === 0) return;
-    
-    assetsArray.forEach(asset => {
-        const assetString = JSON.stringify(asset).toUpperCase();
-        
-        if (assetString.includes('TANAH')) {
-            if (assetString.includes('HGB') || assetString.includes('GUNA BANGUNAN')) {
-                shgb++;
-            } else if (assetString.includes('SHM') || assetString.includes('HAK MILIK')) {
-                shm++;
-            } else if (assetString.includes('GIRIK')) {
-                girik++;
-            } else if (assetString.includes('AJB')) {
-                ajb++;
-            }
-        }
-    });
-
-    const elShgb = document.getElementById('count-shgb');
-    const elShm = document.getElementById('count-shm');
-    const elGirik = document.getElementById('count-girik');
-    const elAjb = document.getElementById('count-ajb');
-
-    if (elShgb) elShgb.innerText = `${shgb} Bidang`;
-    if (elShm) elShm.innerText = `${shm} Bidang`;
-    if (elGirik) elGirik.innerText = `${girik} Bidang`;
-    if (elAjb) elAjb.innerText = `${ajb} Bidang`;
-}
-
-// Panggil otomatis saat halaman dimuat
-document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(() => {
-        if (typeof updateLandLegalSummary === 'function') {
-            updateLandLegalSummary();
-        }
-    }, 1000);
-});
+ 
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
