@@ -2471,12 +2471,13 @@ function filterByLegalitas(jenis) {
     if (typeof filterAssets === 'function') {
       filterAssets();
     } else if (typeof renderTable === 'function') {
-      renderTable();
-		} else if (typeof renderTable === 'function') {
         renderTable();
-        updateLandLegalSummary(allAssets); // <--- Tambahkan baris ini di bawah renderTable();
+        updateLandLegalSummary(allAssets);
     } else {
-    } else {
+        // Picu event secara otomatis jika fungsi spesifik tidak ditemukan
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+        searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
+    }
       // Picu event secara otomatis jika fungsi spesifik tidak ditemukan
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
       searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
@@ -2679,24 +2680,40 @@ function focusAssetOnMap(lat, lng, assetCode) {
 	// Fungsi Rekapitulasi Legalitas Tanah
 function updateLandLegalSummary(assets) {
     let shgb = 0, shm = 0, girik = 0, ajb = 0;
-
+    
     if (!assets || !Array.isArray(assets)) return;
-
+    
     assets.forEach(asset => {
-        if (asset.category === 'Tanah') {
-            const legalitas = (asset.legalitas || asset.statusLegalitas || asset.certType || '').toUpperCase();
+        // Cek kategori dengan fleksibel (menghindari masalah huruf besar/kecil)
+        const cat = (asset.category || asset.kategori || '').toString().toLowerCase();
+        
+        if (cat.includes('tanah')) {
+            // Ambil teks legalitas dari berbagai kemungkinan nama properti data
+            const legal = (asset.legalitas || asset.statusLegalitas || asset.certType || asset['Status Legalitas'] || '').toString().toUpperCase();
             
-            if (legalitas.includes('HGB')) {
+            if (legal.includes('HGB')) {
                 shgb++;
-            } else if (legalitas.includes('SHM') || legalitas.includes('HAK MILIK')) {
+            } else if (legal.includes('SHM') || legal.includes('HAK MILIK')) {
                 shm++;
-            } else if (legalitas.includes('GIRIK')) {
+            } else if (legal.includes('GIRIK')) {
                 girik++;
-            } else if (legalitas.includes('AJB')) {
+            } else if (legal.includes('AJB')) {
                 ajb++;
             }
         }
     });
+
+    // Masukkan hasil hitung ke elemen HTML kartu di dashboard
+    const elShgb = document.getElementById('count-shgb');
+    const elShm = document.getElementById('count-shm');
+    const elGirik = document.getElementById('count-girik');
+    const elAjb = document.getElementById('count-ajb');
+
+    if (elShgb) elShgb.innerText = `${shgb} Bidang`;
+    if (elShm) elShm.innerText = `${shm} Bidang`;
+    if (elGirik) elGirik.innerText = `${girik} Bidang`;
+    if (elAjb) elAjb.innerText = `${ajb} Bidang`;
+}
 
     const elShgb = document.getElementById('count-shgb');
     const elShm = document.getElementById('count-shm');
