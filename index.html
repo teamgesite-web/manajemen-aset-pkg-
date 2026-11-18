@@ -2767,7 +2767,25 @@ function focusAssetOnMap(lat, lng, assetCode) {
 window.addEventListener('load', () => setTimeout(() => {
     if (typeof map !== 'undefined') map.invalidateSize();
 }, 400));
+	
+// Di HP: klik "Zoom Peta" otomatis menutup panel detail, lalu peta terlihat
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('#btn-detail-zoom');
+    if (!btn) return;
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    if (!isMobile) return; // di PC tidak berubah
+
+    setTimeout(() => {
+        if (typeof closeDetailDrawer === 'function') closeDetailDrawer();
+
+        setTimeout(() => {
+            if (typeof map !== 'undefined') map.invalidateSize();
+            const mapEl = document.getElementById('map');
+            if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 350);
+    }, 150);
+}, true);
 // Panggil otomatis saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
