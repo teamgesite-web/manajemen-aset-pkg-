@@ -2130,7 +2130,7 @@ ${asset.category === 'Kendaraan' ? (asset.merk || asset.merk_type || asset.merkT
                     </tr>
                 `;
             }).join('');
-
+		}
         function zoomToSingleAssetById(id) {
             const asset = assets.find(a => a.id === id);
             if (asset) {
