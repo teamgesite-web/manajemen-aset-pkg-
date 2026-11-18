@@ -181,21 +181,25 @@
 
 <!-- BARIS 2: Legalitas tanah -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
-    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-blue-600 flex items-center justify-between">
+    <div onclick="filterByLegalitas('HGB')" title="Klik untuk menampilkan aset HGB"
+         class="cursor-pointer hover:bg-blue-50 hover:shadow transition bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-blue-600 flex items-center justify-between">
         <div class="text-[11px] text-slate-500 font-semibold">SHGB / HGB</div>
-        <div class="text-sm font-bold text-blue-700" id="count-shgb">0 Bidang</div>
+        <div class="text-sm font-bold text-blue-700" id="count-shgb">0 Aset</div>
     </div>
-    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-emerald-600 flex items-center justify-between">
+    <div onclick="filterByLegalitas('SHM')" title="Klik untuk menampilkan aset SHM"
+         class="cursor-pointer hover:bg-emerald-50 hover:shadow transition bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-emerald-600 flex items-center justify-between">
         <div class="text-[11px] text-slate-500 font-semibold">SHM</div>
-        <div class="text-sm font-bold text-emerald-700" id="count-shm">0 Bidang</div>
+        <div class="text-sm font-bold text-emerald-700" id="count-shm">0 Aset</div>
     </div>
-    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-amber-500 flex items-center justify-between">
+    <div onclick="filterByLegalitas('GIRIK')" title="Klik untuk menampilkan aset Girik"
+         class="cursor-pointer hover:bg-amber-50 hover:shadow transition bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-amber-500 flex items-center justify-between">
         <div class="text-[11px] text-slate-500 font-semibold">GIRIK</div>
-        <div class="text-sm font-bold text-amber-600" id="count-girik">0 Bidang</div>
+        <div class="text-sm font-bold text-amber-600" id="count-girik">0 Aset</div>
     </div>
-    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-purple-600 flex items-center justify-between">
+    <div onclick="filterByLegalitas('AJB')" title="Klik untuk menampilkan aset AJB"
+         class="cursor-pointer hover:bg-purple-50 hover:shadow transition bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-purple-600 flex items-center justify-between">
         <div class="text-[11px] text-slate-500 font-semibold">AJB</div>
-        <div class="text-sm font-bold text-purple-700" id="count-ajb">0 Bidang</div>
+        <div class="text-sm font-bold text-purple-700" id="count-ajb">0 Aset</div>
     </div>
 </div>
 
