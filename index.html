@@ -2689,14 +2689,13 @@ function updateLandLegalSummary(assetsData) {
                 ajb++;
             }
         }
-    }
+    });
 
     if (document.getElementById('shgb-count')) document.getElementById('shgb-count').innerText = `${shgb} Bidang`;
     if (document.getElementById('shm-count')) document.getElementById('shm-count').innerText = `${shm} Bidang`;
     if (document.getElementById('girik-count')) document.getElementById('girik-count').innerText = `${girik} Bidang`;
     if (document.getElementById('ajb-count')) document.getElementById('ajb-count').innerText = `${ajb} Bidang`;
 }
-
 // Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
 function focusAssetOnMap(lat, lng, assetCode) {
     if (typeof map !== 'undefined' && lat && lng) {
