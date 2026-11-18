@@ -2763,6 +2763,11 @@ function focusAssetOnMap(lat, lng, assetCode) {
     console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
 }
 
+// Sesuaikan ukuran peta setelah halaman dimuat (untuk tampilan HP)
+window.addEventListener('load', () => setTimeout(() => {
+    if (typeof map !== 'undefined') map.invalidateSize();
+}, 400));
+
 // Panggil otomatis saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
