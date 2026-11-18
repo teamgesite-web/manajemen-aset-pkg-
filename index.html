@@ -2445,7 +2445,10 @@ firebase.database().ref("peta_aset").on('value', (snapshot) => {
     
     // Simpan ke storage lokal agar tetap aman
     saveAssetsToStorage();
-    
+    // --> TAMBAHKAN BARIS INI:
+        updateLandLegalSummary(dataFromServer);
+    }
+});
     // Perbarui tampilan peta/tabel di layar secara otomatis
     if (typeof renderAll === 'function') {
       renderAll();
