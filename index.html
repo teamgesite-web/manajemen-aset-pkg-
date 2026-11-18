@@ -2697,7 +2697,14 @@ function updateLandLegalSummary(assetsData) {
             }
         }
     });
-
+// Panggil otomatis saat halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(() => {
+        if (typeof updateLandLegalSummary === 'function') {
+            updateLandLegalSummary();
+        }
+    }, 1000); // Beri jeda 1 detik agar data Firebase sempat masuk
+});
     // Masukkan hasil ke elemen kartu HTML
     const elShgb = document.getElementById('count-shgb');
     const elShm = document.getElementById('count-shm');
