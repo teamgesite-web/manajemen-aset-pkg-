@@ -2666,7 +2666,54 @@ function closePdfModal() {
         modal.classList.add('hidden');
     }
 }
+// Fungsi Rekapitulasi Legalitas Tanah
+function updateLandLegalSummary(assetsData) {
+    const rawData = assetsData || window.assets || window.dataAsset || [];
+    const assetsArray = Array.isArray(rawData) ? rawData : Object.values(rawData);
+    
+    let shgb = 0, shm = 0, girik = 0, ajb = 0;
+    
+    if (assetsArray.length === 0) return;
+    
+    assetsArray.forEach(asset => {
+        const assetString = JSON.stringify(asset).toUpperCase();
+        
+        if (assetString.includes('TANAH')) {
+            if (assetString.includes('HGB') || assetString.includes('GUNA BANGUNAN')) {
+                shgb++;
+            } else if (assetString.includes('SHM') || assetString.includes('HAK MILIK')) {
+                shm++;
+            } else if (assetString.includes('GIRIK')) {
+                girik++;
+            } else if (assetString.includes('AJB')) {
+                ajb++;
+            }
+        }
+    });
 
+    if (document.getElementById('shgb-count')) document.getElementById('shgb-count').innerText = `${shgb} Bidang`;
+    if (document.getElementById('shm-count')) document.getElementById('shm-count').innerText = `${shm} Bidang`;
+    if (document.getElementById('girik-count')) document.getElementById('girik-count').innerText = `${girik} Bidang`;
+    if (document.getElementById('ajb-count')) document.getElementById('ajb-count').innerText = `${ajb} Bidang`;
+}
+
+// Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
+function focusAssetOnMap(lat, lng, assetCode) {
+    if (typeof map !== 'undefined' && lat && lng) {
+        map.flyTo([lat, lng], 19, { animate: true, duration: 1.5 });
+    }
+    console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
+}
+
+// Panggil otomatis saat halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(() => {
+        if (typeof updateLandLegalSummary === 'function') {
+            updateLandLegalSummary();
+        }
+    }, 1000);
+});
+</script>
 // Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
 function focusAssetOnMap(lat, lng, assetCode) {
     if (typeof map !== 'undefined' && lat && lng) {
