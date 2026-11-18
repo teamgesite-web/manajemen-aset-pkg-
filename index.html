@@ -2672,6 +2672,42 @@ function focusAssetOnMap(lat, lng, assetCode) {
     }
     console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
 }
+	// Fungsi Rekapitulasi Legalitas Tanah
+function updateLandLegalSummary(assets) {
+    let shgb = 0, shm = 0, girik = 0, ajb = 0;
+
+    if (!assets || !Array.isArray(assets)) return;
+
+    assets.forEach(asset => {
+        if (asset.category === 'Tanah') {
+            const legalitas = (asset.legalitas || asset.statusLegalitas || asset.certType || '').toUpperCase();
+            
+            if (legalitas.includes('HGB')) {
+                shgb++;
+            } else if (legalitas.includes('SHM') || legalitas.includes('HAK MILIK')) {
+                shm++;
+            } else if (legalitas.includes('GIRIK')) {
+                girik++;
+            } else if (legalitas.includes('AJB')) {
+                ajb++;
+            }
+        }
+    });
+
+    const elShgb = document.getElementById('count-shgb');
+    const elShm = document.getElementById('count-shm');
+    const elGirik = document.getElementById('count-girik');
+    const elAjb = document.getElementById('count-ajb');
+
+    if (elShgb) elShgb.innerText = `${shgb} Bidang`;
+    if (elShm) elShm.innerText = `${shm} Bidang`;
+    if (elGirik) elGirik.innerText = `${girik} Bidang`;
+    if (elAjb) elAjb.innerText = `${ajb} Bidang`;
+}
+	// Panggil otomatis jika data sudah siap
+if (typeof allAssets !== 'undefined') {
+    updateLandLegalSummary(allAssets);
+}
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
