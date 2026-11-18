@@ -2733,13 +2733,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const elShm = document.getElementById('count-shm');
     const elGirik = document.getElementById('count-girik');
     const elAjb = document.getElementById('count-ajb');
-
-    if (elShgb) elShgb.innerText = `${shgb} Bidang`;
+if (elShgb) elShgb.innerText = `${shgb} Bidang`;
     if (elShm) elShm.innerText = `${shm} Bidang`;
     if (elGirik) elGirik.innerText = `${girik} Bidang`;
     if (elAjb) elAjb.innerText = `${ajb} Bidang`;
 }
-}
+
+// Panggil otomatis saat halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(() => {
+        if (typeof updateLandLegalSummary === 'function') {
+            updateLandLegalSummary();
+        }
+    }, 1000);
+});
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
