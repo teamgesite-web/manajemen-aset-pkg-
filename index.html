@@ -2763,10 +2763,24 @@ function focusAssetOnMap(lat, lng, assetCode) {
     console.log(`Fokus ke aset: ${assetCode} pada koordinat [${lat}, ${lng}]`);
 }
 
-// Sesuaikan ukuran peta setelah halaman dimuat (untuk tampilan HP)
-window.addEventListener('load', () => setTimeout(() => {
-    if (typeof map !== 'undefined') map.invalidateSize();
-}, 400));
+// Sesuaikan ukuran peta setiap kali ukuran kontainer atau jendela berubah
+(function () {
+    function fixMapSize() {
+        if (typeof map !== 'undefined' && map) map.invalidateSize();
+    }
+
+    window.addEventListener('load', () => setTimeout(fixMapSize, 400));
+    window.addEventListener('resize', () => setTimeout(fixMapSize, 200));
+    window.addEventListener('orientationchange', () => setTimeout(fixMapSize, 400));
+
+    // Pantau perubahan ukuran elemen peta itu sendiri
+    window.addEventListener('load', () => {
+        const mapEl = document.getElementById('map');
+        if (mapEl && 'ResizeObserver' in window) {
+            new ResizeObserver(fixMapSize).observe(mapEl);
+        }
+    });
+})();
 	
 // Di HP: klik "Zoom Peta" otomatis menutup panel detail, lalu peta terlihat
 document.addEventListener('click', function (e) {
