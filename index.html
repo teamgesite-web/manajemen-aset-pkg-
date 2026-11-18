@@ -2471,29 +2471,24 @@ ${asset.category === 'Kendaraan' ? (asset.merk || asset.merk_type || asset.merkT
         });
 	// Fungsi untuk memfilter aset saat kartu diklik (Versi Langsung)
 function filterByLegalitas(jenis) {
-  // Cari kolom pencarian utama
-  const searchInput = document.getElementById('search-input') || document.querySelector('input[type="text"]');
-  
-  if (searchInput) {
-    // Jika kotak pencarian sudah berisi 'SHM', klik lagi untuk menghapus/reset filter
-    if (searchInput.value === jenis) {
-      searchInput.value = "";
-    } else {
-      searchInput.value = jenis;
-    }
-    
-    // Panggil fungsi filter atau pencarian data yang ada di aplikasi Anda secara langsung
-    if (typeof filterAssets === 'function') {
-      filterAssets();
-    } else if (typeof renderTable === 'function') {
-        renderTable();
-        updateLandLegalSummary(allAssets);
-    } else {
-        // Picu event secara otomatis jika fungsi spesifik tidak ditemukan
-        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-        searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
-    }
-  }
+    const searchInput = document.getElementById('search-input')
+        || document.querySelector('input[placeholder^="Cari"]')
+        || document.querySelector('input[type="text"]');
+
+    if (!searchInput) return;
+
+    // Klik kartu yang sama sekali lagi = reset filter
+    searchInput.value = (searchInput.value.trim().toUpperCase() === jenis) ? '' : jenis;
+
+    // Picu pencarian seperti saat mengetik manual
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    searchInput.dispatchEvent(new Event('keyup', { bubbles: true }));
+
+    // Kalau aplikasi punya fungsi filter sendiri, panggil juga
+    if (typeof filterAssets === 'function') filterAssets();
+
+    // Gulir ke kotak pencarian supaya hasilnya terlihat
+    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // Tambahkan fungsi di sini (sebelum penutup tag script)
