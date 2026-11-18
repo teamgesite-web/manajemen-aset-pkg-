@@ -2680,31 +2680,40 @@ function closePdfModal() {
 function updateLandLegalSummary(assetsData) {
     const rawData = assetsData || window.assets || window.dataAsset || [];
     const assetsArray = Array.isArray(rawData) ? rawData : Object.values(rawData);
-    
+
     let shgb = 0, shm = 0, girik = 0, ajb = 0;
-    
-   if (assetsArray.length === 0) return;
 
-assetsArray.forEach(asset => {
-    const assetString = JSON.stringify(asset).toUpperCase();
+    if (assetsArray.length === 0) return;
 
-    if (assetString.includes('TANAH')) {
-        if (assetString.includes('HGB') || assetString.includes('GUNA BANGUNAN')) {
+    // Kategori yang ikut dihitung (Tanah + Bangunan)
+    const kategoriDihitung = ['Tanah', 'Bangunan'];
+
+    assetsArray.forEach(asset => {
+        if (!asset || !kategoriDihitung.includes(asset.category)) return;
+
+        // Hanya baca field legalitas, bukan seluruh objek
+        const s = String(asset.legality || '').toUpperCase();
+
+        if (s.includes('HGB') || s.includes('GUNA BANGUNAN')) {
             shgb++;
-        } else if (assetString.includes('SHM') || assetString.includes('HAK MILIK')) {
+        } else if (s.includes('SHM') || s.includes('HAK MILIK')) {
             shm++;
-        } else if (assetString.includes('GIRIK')) {
+        } else if (s.includes('GIRIK')) {
             girik++;
-        } else if (assetString.includes('AJB')) {
+        } else if (s.includes('AJB')) {
             ajb++;
         }
-    }
-});
+    });
 
-if (document.getElementById('count-shgb')) document.getElementById('count-shgb').innerText = `${shgb} Bidang`;
-if (document.getElementById('count-shm')) document.getElementById('count-shm').innerText = `${shm} Bidang`;
-if (document.getElementById('count-girik')) document.getElementById('count-girik').innerText = `${girik} Bidang`;
-if (document.getElementById('count-ajb')) document.getElementById('count-ajb').innerText = `${ajb} Bidang`;
+    const setCount = (id, n) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = `${n} Aset`;
+    };
+
+    setCount('count-shgb', shgb);
+    setCount('count-shm', shm);
+    setCount('count-girik', girik);
+    setCount('count-ajb', ajb);
 }
 // Fungsi Sinkronisasi: Klik baris tabel mengarahkan peta ke koordinat aset
 function focusAssetOnMap(lat, lng, assetCode) {
