@@ -142,92 +142,100 @@
 
     <!-- ==================== 5 KPI SUMMARY CARDS ==================== -->
     <div class="bg-white border-b border-slate-200 px-4 py-2 grid grid-cols-2 md:grid-cols-6 gap-2.5 shrink-0 z-20">
-        <!-- Kartu 1: Total Aset Terdaftar -->
-        <div class="flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70">
-            <div class="w-8 h-8 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-layer-group text-sm"></i>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] text-slate-500 font-medium truncate">Total Aset Terdaftar</p>
-                <p id="kpi-total-assets" class="text-sm sm:text-base font-bold text-slate-800">0 Unit</p>
-            </div>
+        <!-- BARIS 1: KPI utama -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <!-- Kartu 1: Total Aset Terdaftar -->
+    <div class="flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70">
+        <div class="w-8 h-8 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-layer-group text-sm"></i>
         </div>
-
-        <!-- Kartu 2: Total Luas Area Poligon -->
-        <div class="flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70">
-            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-draw-polygon text-sm"></i>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] text-slate-500 font-medium truncate">Total Luas Area Poligon</p>
-                <p id="kpi-total-area" class="text-sm sm:text-base font-bold text-slate-800 truncate">0 m²</p>
-            </div>
+        <div class="min-w-0">
+            <p class="text-[11px] text-slate-500 font-medium truncate">Total Aset Terdaftar</p>
+            <p id="kpi-total-assets" class="text-sm sm:text-base font-bold text-slate-800">0 Unit</p>
         </div>
-
-        <!-- Kartu 3: Jumlah Tanah (Terpisah) -->
-        <div class="flex items-center gap-3 bg-emerald-50/60 px-3 py-1.5 rounded-xl border border-emerald-200/70">
-            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-map text-sm"></i>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] text-emerald-800 font-medium truncate">Jumlah Tanah</p>
-                <p id="kpi-tanah-count" class="text-sm sm:text-base font-bold text-emerald-950 leading-tight">0 Unit</p>
-                <p id="kpi-tanah-area" class="text-[10px] text-emerald-700 font-medium truncate">0 m²</p>
-            </div>
-        </div>
-</div> <!-- (Baris 177: penutup div kartu sebelumnya) -->
-
-    <!-- Kartu Ringkasan Status Legalitas Tanah (SHGB, SHM, Girik, AJB) -->
-    <div class="col-span-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-      <div class="bg-white p-2.5 rounded-lg shadow-sm border-l-4 border-blue-600 border border-slate-200">
-        <div class="text-[11px] text-slate-500 font-semibold">SHGB / HGB</div>
-        <div class="text-sm font-bold text-slate-800" id="count-shgb">0 Bidang</div>
-      </div>
-      <div class="bg-white p-2.5 rounded-lg shadow-sm border-l-4 border-emerald-600 border border-slate-200">
-        <div class="text-[11px] text-slate-500 font-semibold">SHM</div>
-        <div class="text-sm font-bold text-slate-800" id="count-shm">0 Bidang</div>
-      </div>
-      <div class="bg-white p-2.5 rounded-lg shadow-sm border-l-4 border-amber-500 border border-slate-200">
-        <div class="text-[11px] text-slate-500 font-semibold">GIRIK</div>
-        <div class="text-sm font-bold text-slate-800" id="count-girik">0 Bidang</div>
-      </div>
-      <div class="bg-white p-2.5 rounded-lg shadow-sm border-l-4 border-purple-600 border border-slate-200">
-        <div class="text-[11px] text-slate-500 font-semibold">AJB</div>
-        <div class="text-sm font-bold text-slate-800" id="count-ajb">0 Bidang</div>
-      </div>
     </div>
-        <!-- Kartu 4: Jumlah Bangunan (Terpisah) -->
-        <div class="flex items-center gap-3 bg-blue-50/60 px-3 py-1.5 rounded-xl border border-blue-200/70">
-            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-building text-sm"></i>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] text-blue-800 font-medium truncate">Jumlah Bangunan</p>
-                <p id="kpi-bangunan-count" class="text-sm sm:text-base font-bold text-blue-950 leading-tight">0 Unit</p>
-                <p id="kpi-bangunan-area" class="text-[10px] text-blue-700 font-medium truncate">0 m²</p>
-            </div>
+
+    <!-- Kartu 2: Total Luas Area Poligon -->
+    <div class="flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-draw-polygon text-sm"></i>
         </div>
-<!-- Kartu Baru: Jumlah Kendaraan (Terpisah) -->
-        <div class="flex items-center gap-3 bg-amber-50/80 px-3 py-1.5 rounded-xl border border-amber-200/70">
-          <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+        <div class="min-w-0">
+            <p class="text-[11px] text-slate-500 font-medium truncate">Total Luas Area Poligon</p>
+            <p id="kpi-total-area" class="text-sm sm:text-base font-bold text-slate-800 truncate">0 m²</p>
+        </div>
+    </div>
+
+    <!-- Kartu 3: Jumlah Tanah -->
+    <div class="flex items-center gap-3 bg-emerald-50/60 px-3 py-1.5 rounded-xl border border-emerald-200/70">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-map text-sm"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="text-[11px] text-emerald-800 font-medium truncate">Jumlah Tanah</p>
+            <p id="kpi-tanah-count" class="text-sm sm:text-base font-bold text-emerald-950 leading-tight">0 Unit</p>
+            <p id="kpi-tanah-area" class="text-[10px] text-emerald-700 font-medium truncate">0 m²</p>
+        </div>
+    </div>
+</div>
+
+<!-- BARIS 2: Legalitas tanah -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-blue-600 flex items-center justify-between">
+        <div class="text-[11px] text-slate-500 font-semibold">SHGB / HGB</div>
+        <div class="text-sm font-bold text-blue-700" id="count-shgb">0 Bidang</div>
+    </div>
+    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-emerald-600 flex items-center justify-between">
+        <div class="text-[11px] text-slate-500 font-semibold">SHM</div>
+        <div class="text-sm font-bold text-emerald-700" id="count-shm">0 Bidang</div>
+    </div>
+    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-amber-500 flex items-center justify-between">
+        <div class="text-[11px] text-slate-500 font-semibold">GIRIK</div>
+        <div class="text-sm font-bold text-amber-600" id="count-girik">0 Bidang</div>
+    </div>
+    <div class="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-purple-600 flex items-center justify-between">
+        <div class="text-[11px] text-slate-500 font-semibold">AJB</div>
+        <div class="text-sm font-bold text-purple-700" id="count-ajb">0 Bidang</div>
+    </div>
+</div>
+
+<!-- BARIS 3: Bangunan, Kendaraan, Sertifikat -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <!-- Kartu 4: Jumlah Bangunan -->
+    <div class="flex items-center gap-3 bg-blue-50/60 px-3 py-1.5 rounded-xl border border-blue-200/70">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-building text-sm"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="text-[11px] text-blue-800 font-medium truncate">Jumlah Bangunan</p>
+            <p id="kpi-bangunan-count" class="text-sm sm:text-base font-bold text-blue-950 leading-tight">0 Unit</p>
+            <p id="kpi-bangunan-area" class="text-[10px] text-blue-700 font-medium truncate">0 m²</p>
+        </div>
+    </div>
+
+    <!-- Kartu: Jumlah Kendaraan -->
+    <div class="flex items-center gap-3 bg-amber-50/80 px-3 py-1.5 rounded-xl border border-amber-200/70">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-car text-sm"></i>
-          </div>
-          <div class="min-w-0">
+        </div>
+        <div class="min-w-0">
             <p class="text-[11px] text-amber-800 font-medium truncate">Jumlah Kendaraan</p>
             <p id="kpi-kendaraan-count" class="text-sm sm:text-base font-bold text-amber-950 leading-tight">0 Unit</p>
-          </div>
-        </div>
-        <!-- Kartu 5: Sertifikat Resmi -->
-        <div onclick="filterByLegalitas('SHM')" class="md:col-span-1 flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70 cursor-pointer hover:border-blue-400 transition">
-            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-file-shield text-sm"></i>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] text-slate-500 font-medium truncate">Sertifikat Resmi (SHM/HGB)</p>
-                <p id="kpi-certified" class="text-sm sm:text-base font-bold text-slate-800">0 / 0 Aset</p>
-            </div>
         </div>
     </div>
+
+    <!-- Kartu 5: Sertifikat Resmi -->
+    <div onclick="filterByLegalitas('SHM')" class="flex items-center gap-3 bg-slate-50/80 px-3 py-1.5 rounded-xl border border-slate-200/70 cursor-pointer hover:border-blue-400 transition">
+        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-file-shield text-sm"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="text-[11px] text-slate-500 font-medium truncate">Sertifikat Resmi (SHM/HGB)</p>
+            <p id="kpi-certified" class="text-sm sm:text-base font-bold text-slate-800">0 / 0 Aset</p>
+        </div>
+    </div>
+</div>
+</div> <!-- penutup induk -->
 
     <!-- ==================== MAIN WORKSPACE ==================== -->
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
