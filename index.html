@@ -2437,25 +2437,26 @@ ${asset.category === 'Kendaraan' ? (asset.merk || asset.merk_type || asset.merkT
 }
 
 // Mendengarkan perubahan data dari Firebase secara real-time
-firebase.database().ref("peta_aset").on('value', (snapshot) => {
-  const dataFromServer = snapshot.val();
-  if (dataFromServer) {
-    // Ubah data object dari server kembali menjadi array untuk aplikasi GIS
-    assets = Object.values(dataFromServer);
-    
-    // Simpan ke storage lokal agar tetap aman
-    saveAssetsToStorage();
-        updateLandLegalSummary(dataFromServer);
-    }
-});
-    // Perbarui tampilan peta/tabel di layar secara otomatis
-    if (typeof renderAll === 'function') {
-      renderAll();
-    }
-    
-    console.log("Data berhasil disinkronkan secara real-time dari Firebase!");
-  }
-});
+        firebase.database().ref("peta_aset").on('value', (snapshot) => {
+            const dataFromServer = snapshot.val();
+            if (dataFromServer) {
+                // Ubah data object dari server kembali menjadi array untuk aplikasi GIS
+                assets = Object.values(dataFromServer);
+
+                // Simpan ke storage lokal agar tetap aman
+                saveAssetsToStorage();
+                
+                // Perbarui rekapitulasi legalitas tanah
+                updateLandLegalSummary(dataFromServer);
+            }
+
+            // Perbarui tampilan peta/tabel di layar secara otomatis
+            if (typeof renderAll === 'function') {
+                renderAll();
+            }
+
+            console.log("Data berhasil disinkronkan secara real-time dari Firebase!");
+        });
 	// Fungsi untuk memfilter aset saat kartu diklik (Versi Langsung)
 function filterByLegalitas(jenis) {
   // Cari kolom pencarian utama
