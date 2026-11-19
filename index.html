@@ -2830,39 +2830,45 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 1000);
 });
-	// 1. Aturan filter: tiap kategori meloloskan aset yang mana
-const KPI_FILTERS = {
-  all:        a => true,
-  poligon:    a => !!a.geometry,
-  tanah:      a => a.kategori === 'Tanah',
-  bangunan:   a => a.kategori === 'Bangunan',
-  kendaraan:  a => a.kategori === 'Kendaraan',
-  sertifikat: a => a.sertifikat === true,
+	// ===== KARTU KPI BISA DIKLIK (versi memakai filter yang sudah ada) =====
+const KPI_TO_CATEGORY = {
+  all:       'ALL',
+  tanah:     'Tanah',
+  bangunan:  'Bangunan',
+  kendaraan: 'Kendaraan'
 };
 
-// 2. Gaya kartu yang sedang dipilih
-const ACTIVE_CLASSES = ['ring-2', 'ring-blue-500', 'bg-blue-50'];
-let activeKpi = null;
+const KPI_ACTIVE_CLASSES = ['ring-2', 'ring-blue-500', 'bg-blue-50'];
 
-// 3. Fungsi yang dijalankan saat kartu diklik
 function applyKpiFilter(key) {
-  if (activeKpi === key) key = 'all';       // klik lagi = reset
-  activeKpi = key === 'all' ? null : key;
+  const select = document.getElementById('filter-category');
+  if (!select) return;
 
+  // Kartu Poligon & Sertifikat belum punya kategori: dibiarkan seperti "Semua"
+  let nilai = KPI_TO_CATEGORY[key] || 'ALL';
+
+  // Klik kartu yang sama lagi = reset ke Semua Kategori
+  if (select.value === nilai && nilai !== 'ALL') {
+    nilai = 'ALL';
+    key = 'all';
+  }
+
+  select.value = nilai;
+
+  // Tandai kartu yang aktif
   document.querySelectorAll('.kpi-card').forEach(c => {
-    const aktif = c.dataset.filter === activeKpi;
-    ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
+    const aktif = nilai !== 'ALL' && c.dataset.filter === key;
+    KPI_ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
   });
 
-  const hasil = allAssets.filter(KPI_FILTERS[key]);
-  renderTable(hasil);
-  renderMap(hasil);
+  // Jalankan fungsi yang sama seperti saat dropdown diubah
+  renderAssetTable();
 }
 
-// 4. Pasang klik ke keenam kartu
 document.querySelectorAll('.kpi-card').forEach(card => {
   card.addEventListener('click', () => applyKpiFilter(card.dataset.filter));
 });
+// ===== AKHIR =====
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
