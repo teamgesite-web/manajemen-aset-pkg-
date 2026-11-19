@@ -841,20 +841,30 @@
         // ==========================================
         // 1. STATE & INITIAL SAMPLE DATA (PESONA KAHURIPAN)
         // ==========================================
-        const STORAGE_KEY = 'aset_pesona_kahuripan_v3';
-        const GSHEET_URL_KEY = 'aset_pesona_kahuripan_gsheet_url';
-        const GDRIVE_FOLDER_KEY = 'aset_pesona_kahuripan_gdrive_folder';
-        const ADMIN_PIN = '1234';
+       const STORAGE_KEY = 'aset_pesona_kahuripan_v3';
+const GSHEET_URL_KEY = 'aset_pesona_kahuripan_gsheet_url';
+const GDRIVE_FOLDER_KEY = 'aset_pesona_kahuripan_gdrive_folder';
 
-        let isAdmin = false;
-        let assets = [];
-        let selectedAssetId = null;
+let isAdmin = false;
+let adminToken = '';
+let assets = [];
+let selectedAssetId = null;
 
-        let map = null;
-        let assetPolygonsLayer = null;
-        let drawnItems = null;
-        let activePolygonDrawer = null;
-        let drawingTriggeredFromModal = false;
+let map = null;
+let assetPolygonsLayer = null;
+let drawnItems = null;
+let activePolygonDrawer = null;
+let drawingTriggeredFromModal = false;
+		async function callApi(payload) {
+    const webhookUrl = localStorage.getItem(GSHEET_URL_KEY);
+    if (!webhookUrl) throw new Error('URL Google Sheet belum diatur.');
+    const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    });
+    return await res.json();
+}
 
         // Temporary PDF state while Form Modal is open
         let currentFormPDF = {
@@ -1464,18 +1474,30 @@
             document.getElementById('admin-login-modal').classList.remove('flex');
         }
 
-        function submitAdminLogin(event) {
-            event.preventDefault();
-            const pin = document.getElementById('admin-pin-input').value.trim();
-            if (pin === ADMIN_PIN) {
-                isAdmin = true;
-                closeAdminLoginModal();
-                updateAdminUI();
-                showToast('Login Admin berhasil! Anda dapat menambah/mengedit data aset & PDF.', 'success');
-            } else {
-                showToast('Hubungi Team Gesit', 'error');
-            }
+        async function submitAdminLogin(event) {
+    event.preventDefault();
+    const input = document.getElementById('admin-pin-input');
+    const btn = event.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    try {
+        const res = await callApi({ action: 'login', pin: input.value.trim() });
+        input.value = '';
+        if (res.ok) {
+            isAdmin = true;
+            adminToken = res.token;
+            closeAdminLoginModal();
+            updateAdminUI();
+            showToast('Login Admin berhasil! Anda dapat menambah/mengedit data aset & PDF.', 'success');
+        } else {
+            showToast(res.message || 'Login gagal.', 'error');
         }
+    } catch (err) {
+        showToast('Tidak bisa terhubung ke server. Coba lagi.', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
 
         function updateAdminUI() {
             const btnAdmin = document.getElementById('btn-admin-mode');
