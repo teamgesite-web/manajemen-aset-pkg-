@@ -169,7 +169,7 @@
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
 
     <!-- Total Aset -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="all" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-layer-group"></i>
         </div>
@@ -180,7 +180,7 @@
     </div>
 
     <!-- Total Luas -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="poligon" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-draw-polygon"></i>
         </div>
@@ -191,7 +191,7 @@
     </div>
 
     <!-- Jumlah Tanah -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="tanah" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-map"></i>
         </div>
@@ -203,7 +203,7 @@
     </div>
 
     <!-- Jumlah Bangunan -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="bangunan" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-building"></i>
         </div>
@@ -215,7 +215,7 @@
     </div>
 
     <!-- Jumlah Kendaraan -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="kendaraan" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-car"></i>
         </div>
@@ -226,7 +226,7 @@
     </div>
 
     <!-- Sertifikat Resmi -->
-    <div class="flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+    <div data-filter="sertifikat" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-file-shield"></i>
         </div>
@@ -2829,6 +2829,39 @@ document.addEventListener("DOMContentLoaded", function() {
             updateLandLegalSummary();
         }
     }, 1000);
+});
+	// 1. Aturan filter: tiap kategori meloloskan aset yang mana
+const KPI_FILTERS = {
+  all:        a => true,
+  poligon:    a => !!a.geometry,
+  tanah:      a => a.kategori === 'Tanah',
+  bangunan:   a => a.kategori === 'Bangunan',
+  kendaraan:  a => a.kategori === 'Kendaraan',
+  sertifikat: a => a.sertifikat === true,
+};
+
+// 2. Gaya kartu yang sedang dipilih
+const ACTIVE_CLASSES = ['ring-2', 'ring-blue-500', 'bg-blue-50'];
+let activeKpi = null;
+
+// 3. Fungsi yang dijalankan saat kartu diklik
+function applyKpiFilter(key) {
+  if (activeKpi === key) key = 'all';       // klik lagi = reset
+  activeKpi = key === 'all' ? null : key;
+
+  document.querySelectorAll('.kpi-card').forEach(c => {
+    const aktif = c.dataset.filter === activeKpi;
+    ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
+  });
+
+  const hasil = allAssets.filter(KPI_FILTERS[key]);
+  renderTable(hasil);
+  renderMap(hasil);
+}
+
+// 4. Pasang klik ke keenam kartu
+document.querySelectorAll('.kpi-card').forEach(card => {
+  card.addEventListener('click', () => applyKpiFilter(card.dataset.filter));
 });
 </script>
 
