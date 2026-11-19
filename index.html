@@ -2336,12 +2336,12 @@ ${asset.category === 'Kendaraan' ? (asset.merk || asset.merk_type || asset.merkT
                     ...asset,
                     driveFolderName: asset.driveFolderName || localStorage.getItem(GDRIVE_FOLDER_KEY) || 'Dokumen_Aset_Pesona_Kahuripan'
                 };
-                await fetch(webhookUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const res = await callApi({ ...payload, token: adminToken });
+if (!res.ok) {
+    showToast(res.message || 'Gagal menyimpan ke Sheet.', 'error');
+    return;
+}
+// opsional: res.driveUrl berisi link PDF di Drive, res.action = "updated" / "appended"
                 document.getElementById('last-sync-text').textContent = hasPdfUpload
                     ? `PDF & Data terkirim (${new Date().toLocaleTimeString('id-ID')})`
                     : `Synced (${new Date().toLocaleTimeString('id-ID')})`;
