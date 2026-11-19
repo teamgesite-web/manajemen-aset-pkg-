@@ -296,15 +296,13 @@
                 </div>
                 
                 <div class="flex items-center justify-between gap-1.5">
-                   <select id="filter-category" onchange="polygonMode = false; renderAssetTable()" class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select id="filter-category" onchange="polygonMode = false; certMode = false; renderAssetTable()" class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
     <option value="ALL">Semua Kategori</option>
     <option value="Tanah">Tanah</option>
     <option value="Bangunan">Bangunan</option>
-    <!-- Tambahkan dua baris ini -->
     <option value="Kendaraan">Kendaraan</option>
     <option value="Elektronik">Elektronik</option>
 </select>
-                    </select>
 
                     <button type="button" onclick="openAddAssetModal()" id="btn-table-add" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg items-center gap-1 shrink-0 shadow-sm">
                         <i class="fa-solid fa-plus"></i>
@@ -2855,27 +2853,34 @@ function applyKpiFilter(key) {
 
   let nilai = KPI_TO_CATEGORY[key] || 'ALL';
   let modePoligon = (key === 'poligon');
+  let modeSertifikat = (key === 'sertifikat');
 
   // Klik kartu yang sama lagi = reset
   if (modePoligon && polygonMode) {
     modePoligon = false;
     key = 'all';
-  } else if (!modePoligon && select.value === nilai && nilai !== 'ALL') {
+  } else if (modeSertifikat && certMode) {
+    modeSertifikat = false;
+    key = 'all';
+  } else if (!modePoligon && !modeSertifikat && select.value === nilai && nilai !== 'ALL') {
     nilai = 'ALL';
     key = 'all';
   }
 
   select.value = nilai;
   polygonMode = modePoligon;
+  certMode = modeSertifikat;
 
   // Tandai kartu yang aktif
   document.querySelectorAll('.kpi-card').forEach(c => {
-    const aktif = (modePoligon && c.dataset.filter === 'poligon')
-               || (!modePoligon && nilai !== 'ALL' && c.dataset.filter === key);
+    const f = c.dataset.filter;
+    const aktif = (modePoligon && f === 'poligon')
+               || (modeSertifikat && f === 'sertifikat')
+               || (!modePoligon && !modeSertifikat && nilai !== 'ALL' && f === key);
     KPI_ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
   });
 
-  // Kosongkan kotak pencarian (mis. sisa "SHM" dari kartu legalitas)
+  // Kosongkan kotak pencarian
   const search = document.getElementById('search-input');
   if (search) search.value = '';
 
