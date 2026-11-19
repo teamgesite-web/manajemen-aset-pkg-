@@ -2861,6 +2861,10 @@ function applyKpiFilter(key) {
     KPI_ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
   });
 
+  // Kosongkan kotak pencarian (mis. sisa "SHM" dari kartu legalitas)
+  const search = document.getElementById('search-input');
+  if (search) search.value = '';
+
   // Jalankan fungsi yang sama seperti saat dropdown diubah
   renderAssetTable();
 }
