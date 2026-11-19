@@ -408,6 +408,7 @@
                 <div class="flex items-center gap-4">
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span> Tanah</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block"></span> Bangunan</span>
+					<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Kendaraan</span>
                 </div>
                 <div id="map-coords" class="font-mono text-[11px] text-slate-400">
                     Lat: -6.48250, Lng: 106.95320
@@ -1132,7 +1133,9 @@ let drawingTriggeredFromModal = false;
         }
 
         function getCategoryColor(category) {
-            return category === 'Bangunan' ? '#3b82f6' : '#10b981';
+            if (category === 'Bangunan') return '#3b82f6';   // biru
+            if (category === 'Kendaraan') return '#f59e0b';  // kuning
+            return '#10b981';                                 // hijau (Tanah & lainnya)
         }
 
         function renderMapPolygons() {
