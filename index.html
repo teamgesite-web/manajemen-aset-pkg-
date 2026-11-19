@@ -296,7 +296,7 @@
                 </div>
                 
                 <div class="flex items-center justify-between gap-1.5">
-                    <select id="filter-category" onchange="renderAssetTable()" class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select id="filter-category" onchange="polygonMode = false; renderAssetTable()" class="flex-1 bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
     <option value="ALL">Semua Kategori</option>
     <option value="Tanah">Tanah</option>
     <option value="Bangunan">Bangunan</option>
@@ -2139,6 +2139,7 @@ if (isDuplicate) {
     // 4. Update Sertifikat Resmi hanya membandingkan dari Tanah & Bangunan (bukan Kendaraan)
     document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${validCertifiedAssets.length} Aset`;
 		}
+		let polygonMode = false;
         function renderAssetTable() {
             const tbody = document.getElementById('asset-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -2154,7 +2155,8 @@ const thLabel = document.getElementById('th-luas-label');
         thStatusLabel.textContent = (catFilter === 'Kendaraan') ? 'NO. POLISI' : 'STATUS';
     }
             const filtered = assets.filter(a => {
-                const matchesCat = catFilter === 'ALL' || a.category === catFilter;
+                                const matchesCat = (catFilter === 'ALL' || a.category === catFilter)
+                    && (!polygonMode || a.category === 'Tanah' || a.category === 'Bangunan');
                 const matchesQuery = !searchQuery || 
             (a.code && a.code.toLowerCase().includes(searchQuery)) || 
             (a.name && a.name.toLowerCase().includes(searchQuery)) || 
@@ -2844,20 +2846,25 @@ function applyKpiFilter(key) {
   const select = document.getElementById('filter-category');
   if (!select) return;
 
-  // Kartu Poligon & Sertifikat belum punya kategori: dibiarkan seperti "Semua"
   let nilai = KPI_TO_CATEGORY[key] || 'ALL';
+  let modePoligon = (key === 'poligon');
 
-  // Klik kartu yang sama lagi = reset ke Semua Kategori
-  if (select.value === nilai && nilai !== 'ALL') {
+  // Klik kartu yang sama lagi = reset
+  if (modePoligon && polygonMode) {
+    modePoligon = false;
+    key = 'all';
+  } else if (!modePoligon && select.value === nilai && nilai !== 'ALL') {
     nilai = 'ALL';
     key = 'all';
   }
 
   select.value = nilai;
+  polygonMode = modePoligon;
 
   // Tandai kartu yang aktif
   document.querySelectorAll('.kpi-card').forEach(c => {
-    const aktif = nilai !== 'ALL' && c.dataset.filter === key;
+    const aktif = (modePoligon && c.dataset.filter === 'poligon')
+               || (!modePoligon && nilai !== 'ALL' && c.dataset.filter === key);
     KPI_ACTIVE_CLASSES.forEach(cls => c.classList.toggle(cls, aktif));
   });
 
@@ -2865,7 +2872,6 @@ function applyKpiFilter(key) {
   const search = document.getElementById('search-input');
   if (search) search.value = '';
 
-  // Jalankan fungsi yang sama seperti saat dropdown diubah
   renderAssetTable();
 }
 
