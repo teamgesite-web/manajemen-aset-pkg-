@@ -1493,7 +1493,8 @@ let drawingTriggeredFromModal = false;
         } else {
             showToast(res.message || 'Login gagal.', 'error');
         }
-    } catch (err) {
+       } catch (err) {
+        console.error('Login error:', err);
         showToast('Tidak bisa terhubung ke server. Coba lagi.', 'error');
     } finally {
         btn.disabled = false;
