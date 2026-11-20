@@ -2837,11 +2837,9 @@ document.addEventListener('click', function (e) {
 }, true);
 // Panggil otomatis saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(() => {
-        if (typeof updateLandLegalSummary === 'function') {
-            updateLandLegalSummary();
-        }
-    }, 1000);
+    if (typeof updateLandLegalSummary === 'function') {
+        updateLandLegalSummary();
+    }
 });
 	// ===== KARTU KPI BISA DIKLIK (versi memakai filter yang sudah ada) =====
 const KPI_TO_CATEGORY = {
