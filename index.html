@@ -1651,12 +1651,22 @@ const categoryEl = document.getElementById('form-category');
 
     document.getElementById('asset-form-modal').classList.remove('hidden');
     document.getElementById('asset-form-modal').classList.add('flex');
-
     if (typeof handleCategoryChange === 'function') {
         handleCategoryChange();
     }
-}
 
+    // Pulihkan nilai asli yang tertimpa oleh handleCategoryChange
+    document.getElementById('form-code').value = asset.code;
+
+    const legalitySelect = document.getElementById('form-legality');
+    if (legalitySelect) {
+        // Jika opsi lama tidak ada di daftar, tambahkan agar tidak hilang
+        if (asset.legality && ![...legalitySelect.options].some(o => o.value === asset.legality)) {
+            legalitySelect.add(new Option(asset.legality, asset.legality));
+        }
+        legalitySelect.value = asset.legality || legalitySelect.value;
+    }
+}
         function closeAssetFormModal() {
             document.getElementById('asset-form-modal').classList.add('hidden');
             document.getElementById('asset-form-modal').classList.remove('flex');
@@ -2632,6 +2642,7 @@ function handleCategoryChange() {
   const inputNoDoc = document.getElementById('form-cert-no');
   const selectLegality = document.getElementById('form-legality');
   const inputKodeAset = document.getElementById('form-code');
+  const sedangEdit = !!document.getElementById('form-id').value;
 const kendaraanFields = document.getElementById('kendaraan-fields');
   if (kendaraanFields) {
     if (category === 'Kendaraan') {
@@ -2645,7 +2656,7 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
     if (labelLuas) labelLuas.innerText = 'Tahun / Spesifikasi';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: B 1234 ABC';
-    if (inputKodeAset) inputKodeAset.value = generateNextAssetCode('KND');
+    if (inputKodeAset && !sedangEdit) inputKodeAset.value = generateNextAssetCode('KND');
     
     if (selectLegality) {
       selectLegality.innerHTML = `
@@ -2661,7 +2672,7 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     if (labelNoDokumen) labelNoDokumen.innerText = 'Serial Number (S/N)';
     if (labelLuas) labelLuas.innerText = 'Tahun Pengadaan';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: SN-9912049';
-    if (inputKodeAset) inputKodeAset.value = generateNextAssetCode('ELK');
+    if (inputKodeAset && !sedangEdit) inputKodeAset.value = generateNextAssetCode('ELK');
     
     if (selectLegality) {
       selectLegality.innerHTML = `
@@ -2675,7 +2686,7 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     if (labelNoDokumen) labelNoDokumen.innerText = 'No. IMB / PBG / Sertifikat';
     if (labelLuas) labelLuas.innerHTML = 'Luas Bangunan (m²) <span class="text-rose-500">*</span>';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: PBG-0123/2026';
-    if (inputKodeAset) inputKodeAset.value = generateNextAssetCode('BGN');
+    if (inputKodeAset && !sedangEdit) inputKodeAset.value = generateNextAssetCode('BGN');
     
     if (selectLegality) {
       selectLegality.innerHTML = `
@@ -2691,7 +2702,7 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     if (labelNoDokumen) labelNoDokumen.innerText = 'No. Sertifikat / Dokumen';
     if (labelLuas) labelLuas.innerHTML = 'Luas Area (m²) <span class="text-rose-500">*</span>';
     if (inputNoDoc) inputNoDoc.placeholder = 'SHM No. 01234/Klapanunggal';
-    if (inputKodeAset) inputKodeAset.value = generateNextAssetCode('TNH');
+    if (inputKodeAset && !sedangEdit) inputKodeAset.value = generateNextAssetCode('TNH');
     
     if (selectLegality) {
       selectLegality.innerHTML = `
