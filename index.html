@@ -1602,7 +1602,7 @@ const categoryEl = document.getElementById('form-category');
     const asset = assets.find(a => a.id === assetId);
     if (!asset) return;
 
-    clearSelectedPDFUI();
+    clearSelectedPDF();
     document.getElementById('form-id').value = asset.id;
     document.getElementById('modal-form-title').textContent = `Edit Aset - ${asset.code}`;
 
