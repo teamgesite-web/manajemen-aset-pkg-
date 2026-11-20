@@ -854,8 +854,10 @@ let assetPolygonsLayer = null;
 let drawnItems = null;
 let activePolygonDrawer = null;
 let drawingTriggeredFromModal = false;
+				const DEFAULT_GSHEET_URL = 'https://script.google.com/macros/s/AKfycbyBOzhgdJZyE3esz1ZILZwnopieVTDbHpvs6h9AXp4M5Nc0u6wDe_njBRLIBllGi0C1Ng/exec';
+
 		async function callApi(payload) {
-    const webhookUrl = localStorage.getItem(GSHEET_URL_KEY);
+    const webhookUrl = localStorage.getItem(GSHEET_URL_KEY) || DEFAULT_GSHEET_URL;
     if (!webhookUrl) throw new Error('URL Google Sheet belum diatur.');
     const res = await fetch(webhookUrl, {
         method: 'POST',
