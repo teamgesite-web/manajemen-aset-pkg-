@@ -1460,8 +1460,10 @@ let drawingTriggeredFromModal = false;
         // 6. ADMIN AUTHENTICATION & UI STATE
         // ==========================================
         function handleAdminButtonClick() {
-            if (isAdmin) {
+                       if (isAdmin) {
                 isAdmin = false;
+                adminToken = '';
+                try { sessionStorage.removeItem('aset_admin_token'); } catch (e) {}
                 updateAdminUI();
                 showToast('Keluar dari Mode Admin (Mode Viewer aktif).', 'info');
             } else {
@@ -1486,9 +1488,10 @@ let drawingTriggeredFromModal = false;
     try {
         const res = await callApi({ action: 'login', pin: input.value.trim() });
         input.value = '';
-        if (res.ok) {
+                if (res.ok) {
             isAdmin = true;
             adminToken = res.token;
+            try { sessionStorage.setItem('aset_admin_token', adminToken); } catch (e) {}
             closeAdminLoginModal();
             updateAdminUI();
             showToast('Login Admin berhasil! Anda dapat menambah/mengedit data aset & PDF.', 'success');
@@ -2895,6 +2898,17 @@ document.querySelectorAll('.kpi-card').forEach(card => {
   card.addEventListener('click', () => applyKpiFilter(card.dataset.filter));
 });
 // ===== AKHIR =====
+	// Pulihkan login admin setelah refresh
+document.addEventListener("DOMContentLoaded", function() {
+    try {
+        const saved = sessionStorage.getItem('aset_admin_token');
+        if (saved) {
+            adminToken = saved;
+            isAdmin = true;
+            updateAdminUI();
+        }
+    } catch (e) {}
+});
 </script>
 
 <!-- Modal Pratinjau Dokumen PDF -->
