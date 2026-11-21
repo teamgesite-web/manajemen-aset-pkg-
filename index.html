@@ -1134,6 +1134,14 @@ let drawingTriggeredFromModal = false;
             renderAll();
             showToast(`${jumlah} kendaraan diseragamkan.`, 'success');
         }
+		function getJenisKendaraanLabel(legality) {
+    const l = (legality || '').toLowerCase();
+    if (l.includes('motor')) return 'Motor';
+    if (l.includes('mobil')) return 'Mobil';
+    if (l.includes('truk')) return 'Truk';
+    if (l.includes('alat berat')) return 'Alat Berat';
+    return legality;
+}
         function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
             if (category === 'Kendaraan') return '#f59e0b';  // kuning
@@ -2227,8 +2235,9 @@ const thLabel = document.getElementById('th-luas-label');
                             <div class="flex items-center gap-1">
                                 <span class="w-2 h-2 rounded-full shrink-0" style="background:${color}"></span>
                                 <span>${asset.code}</span>
-                            </div>
+                                                        </div>
                             <span class="inline-block mt-0.5 text-[9px] font-sans font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">${asset.category}</span>
+                            ${asset.category === 'Kendaraan' && asset.legality ? `<span class="inline-block mt-0.5 text-[9px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">${getJenisKendaraanLabel(asset.legality)}</span>` : ''}
                         </td>
                         <td class="py-2 px-2 align-top max-w-[135px]">
                             <div class="flex items-center gap-1">
