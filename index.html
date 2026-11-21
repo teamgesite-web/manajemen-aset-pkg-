@@ -558,7 +558,7 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
         <div>
             <label style="font-size: 12px; font-weight: 600;">Tahun Pembuatan</label>
-            <input type="text" id="form-tahun" placeholder="2025" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <input type="text" id="form-tahun-pembuatan" placeholder="2025" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
         </div>
         <div>
             <label style="font-size: 12px; font-weight: 600;">Warna Kendaraan</label>
@@ -1897,8 +1897,10 @@ if (isDuplicate) {
                 bpkb: document.getElementById('form-bpkb') ? document.getElementById('form-bpkb').value.trim() : '',
                 category: document.getElementById('form-category').value,
                 legality: document.getElementById('form-legality').value,
-                certNo: document.getElementById('form-cert-no').value.trim(),
-                area: parseFloat(document.getElementById('form-area').value) || 0,
+                                certNo: document.getElementById('form-cert-no').value.trim(),
+                area: (document.getElementById('form-category').value === 'Kendaraan')
+                    ? (parseInt(document.getElementById('form-tahun-pembuatan') ? document.getElementById('form-tahun-pembuatan').value : '') || 0)
+                    : (parseFloat(document.getElementById('form-area').value) || 0),
                 status: document.getElementById('form-status').value.trim(),
                 location: document.getElementById('form-location').value.trim(),
                 center: centerStr,
@@ -2663,13 +2665,24 @@ function handleCategoryChange() {
   const inputKodeAset = document.getElementById('form-code');
   const sedangEdit = !!document.getElementById('form-id').value;
 const kendaraanFields = document.getElementById('kendaraan-fields');
-  if (kendaraanFields) {
+    if (kendaraanFields) {
     if (category === 'Kendaraan') {
       kendaraanFields.style.display = 'block';
     } else {
       kendaraanFields.style.display = 'none';
     }
   }
+
+  // Sembunyikan "Tahun / Spesifikasi" (form-area) untuk Kendaraan
+  const areaInput = document.getElementById('form-area');
+  const areaWrapper = areaInput ? areaInput.parentElement : null;
+  if (areaWrapper) {
+    areaWrapper.style.display = (category === 'Kendaraan') ? 'none' : '';
+  }
+  if (areaInput) {
+    areaInput.required = (category !== 'Kendaraan');
+  }
+
   if (category === 'Kendaraan') {
     if (labelLegalitas) labelLegalitas.innerText = 'Kondisi / Jenis Kendaraan';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
