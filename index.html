@@ -1116,6 +1116,24 @@ let drawingTriggeredFromModal = false;
             }, 250);
         }
 
+		function seragamkanJenisKendaraan() {
+            const peta = {
+                'Mobil Operasional': 'Mobil',
+                'Motor Lapangan': 'Motor',
+                'Truk / Angkutan': 'Truk'
+            };
+            let jumlah = 0;
+            assets.forEach(a => {
+                if (a.category === 'Kendaraan' && peta[a.legality]) {
+                    a.legality = peta[a.legality];
+                    jumlah++;
+                }
+            });
+            saveAssetsToStorage();
+            persistToFirebase();
+            renderAll();
+            showToast(`${jumlah} kendaraan diseragamkan.`, 'success');
+        }
         function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
             if (category === 'Kendaraan') return '#f59e0b';  // kuning
@@ -2659,17 +2677,17 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
   }
 
   if (category === 'Kendaraan') {
-    if (labelLegalitas) labelLegalitas.innerText = 'Kondisi / Jenis Kendaraan';
+    if (labelLegalitas) labelLegalitas.innerText = 'Jenis Kendaraan';
     if (labelNoDokumen) labelNoDokumen.innerText = 'Nomor Polisi (Nopol)';
     if (labelLuas) labelLuas.innerText = 'Tahun / Spesifikasi';
     if (inputNoDoc) inputNoDoc.placeholder = 'Contoh: B 1234 ABC';
     if (inputKodeAset && !sedangEdit) inputKodeAset.value = generateNextAssetCode('KND');
     
     if (selectLegality) {
-      selectLegality.innerHTML = `
-        <option value="Mobil Operasional">Mobil Operasional</option>
-        <option value="Motor Lapangan">Motor Lapangan</option>
-        <option value="Truk / Angkutan">Truk / Angkutan</option>
+            selectLegality.innerHTML = `
+        <option value="Mobil">Mobil</option>
+        <option value="Motor">Motor</option>
+        <option value="Truk">Truk</option>
         <option value="Alat Berat">Alat Berat</option>
         <option value="Lainnya">Lainnya</option>
       `;
