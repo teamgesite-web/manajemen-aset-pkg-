@@ -185,7 +185,7 @@
             <i class="fa-solid fa-draw-polygon"></i>
         </div>
         <div class="min-w-0">
-            <p class="text-[11px] text-slate-500 font-medium truncate">Total Luas Poligon</p>
+            <p class="text-[11px] text-slate-500 font-medium truncate">Luas Tanah Berpoligon</p>
             <p id="kpi-total-area" class="text-lg font-extrabold text-slate-800 leading-tight truncate">0 m²</p>
         </div>
     </div>
@@ -2203,7 +2203,8 @@ if (isDuplicate) {
     const tanahArea = tanahAssets.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
 
     // Total Luas Area Poligon murni hanya mengambil dari total luas tanah
-    const totalArea = tanahArea;
+   const tanahBerpoligon = tanahAssets.filter(a => Array.isArray(a.polygon) && a.polygon.length >= 3);
+const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0), 0);
 
             const bangunanAssets = assets.filter(a => a.category === 'Bangunan');
     const bangunanCount = bangunanAssets.length;
@@ -2270,7 +2271,7 @@ const thLabel = document.getElementById('th-luas-label');
     }
             const filtered = assets.filter(a => {
                                                 const matchesCat = (catFilter === 'ALL' || a.category === catFilter)
-    && (!polygonMode || a.category === 'Tanah' || a.category === 'Bangunan')
+    && (!polygonMode || (a.category === 'Tanah' && Array.isArray(a.polygon) && a.polygon.length >= 3))
     && (!certMode || ((a.category === 'Tanah' || a.category === 'Bangunan') && isSertifikatResmi(a)))
     && (jenisFilter === 'ALL' || getJenisKendaraanLabel(a.legality) === jenisFilter);
                 const matchesQuery = !searchQuery || 
