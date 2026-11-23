@@ -599,9 +599,43 @@
         <div>
             <label style="font-size: 12px; font-weight: 600;">Nama Pemilik di BPKB</label>
            <input type="text" id="form-bpkb" placeholder="Nama sesuai BPKB" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+               </div>
+    </div>
+</div>
+
+<!-- Container Data Bangunan -->
+<div id="takeover-fields" style="display: none; border: 1px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px; background-color: #f8fafc; grid-column: span 3;">
+    <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 14px; font-weight: bold; color: #334155;">Data Bangunan</h4>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+            <label style="font-size: 12px; font-weight: 600;">Tipe</label>
+            <input type="text" id="form-tipe-bangunan" placeholder="30/66" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: 600;">Blok</label>
+            <input type="text" id="form-blok" placeholder="O16-22" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+            <label style="font-size: 12px; font-weight: 600;">Akta PPJB</label>
+            <select id="form-akta-ppjb" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff;">
+                <option value="Tidak">Tidak Ada</option>
+                <option value="Ada">Ada</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: 600;">Akta Kuasa</label>
+            <select id="form-akta-kuasa" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff;">
+                <option value="Tidak">Tidak Ada</option>
+                <option value="Ada">Ada</option>
+            </select>
         </div>
     </div>
 </div>
+
                     <div>
                         <label id="label-legalitas" class="block font-semibold text-slate-700 mb-1">Status Legalitas</label>
                         <select id="form-legality" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1637,6 +1671,11 @@ const categoryEl = document.getElementById('form-category');
     if (document.getElementById('form-no-mesin')) document.getElementById('form-no-mesin').value = asset.noMesin || '';
     if (document.getElementById('form-pemegang')) document.getElementById('form-pemegang').value = asset.pemegang || '';
     if (document.getElementById('form-bpkb')) document.getElementById('form-bpkb').value = asset.bpkb || '';
+		      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setVal('form-tipe-bangunan', asset.tipeBangunan);
+    setVal('form-blok', asset.blok);
+    setVal('form-akta-ppjb', asset.aktaPPJB || 'Tidak');
+    setVal('form-akta-kuasa', asset.aktaKuasa || 'Tidak');
 
     // Data form lainnya
     document.getElementById('form-legality').value = asset.legality;
@@ -1904,6 +1943,10 @@ if (isDuplicate) {
                 noMesin: document.getElementById('form-no-mesin') ? document.getElementById('form-no-mesin').value.trim() : '',
                 pemegang: document.getElementById('form-pemegang') ? document.getElementById('form-pemegang').value.trim() : '',
                 bpkb: document.getElementById('form-bpkb') ? document.getElementById('form-bpkb').value.trim() : '',
+				                tipeBangunan: document.getElementById('form-tipe-bangunan') ? document.getElementById('form-tipe-bangunan').value.trim() : '',
+                blok: document.getElementById('form-blok') ? document.getElementById('form-blok').value.trim() : '',
+                aktaPPJB: document.getElementById('form-akta-ppjb') ? document.getElementById('form-akta-ppjb').value : 'Tidak',
+                aktaKuasa: document.getElementById('form-akta-kuasa') ? document.getElementById('form-akta-kuasa').value : 'Tidak',
                 category: document.getElementById('form-category').value,
                 legality: document.getElementById('form-legality').value,
                                 certNo: document.getElementById('form-cert-no').value.trim(),
@@ -2696,6 +2739,10 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     } else {
       kendaraanFields.style.display = 'none';
     }
+  }
+	  const takeoverFields = document.getElementById('takeover-fields');
+  if (takeoverFields) {
+    takeoverFields.style.display = (category === 'Bangunan') ? 'block' : 'none';
   }
 
   // Sembunyikan "Tahun / Spesifikasi" (form-area) untuk Kendaraan
