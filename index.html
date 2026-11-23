@@ -660,7 +660,7 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">STATUS ASET <span class="text-rose-500">*</span></label>
-                        <input type="text" id="form-status" list="status-aset-suggestions" required placeholder="Ketik status aset (misal: Sudah Bebas, Proses AJB, Terbangun)" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="form-status" list="status-aset-suggestions" autocomplete="off" required placeholder="Ketik status aset (misal: Sudah Bebas, Proses AJB, Terbangun)" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <datalist id="status-aset-suggestions">
                             <option value="Sudah Bebas">
                             <option value="Tanah Kosong">
@@ -668,7 +668,11 @@
                             <option value="Aktif / Terbangun">
                             <option value="Cadangan Lahan">
                             <option value="Dalam Proses Sertifikasi">
-                                                        <option value="Sengketa / Verifikasi">
+							<option value="Sengketa / Verifikasi">
+							<option value="Sudah Terbangun">
+							<option value="Fasum / Fasos">
+							<option value="Disewakan / Dikelola Pihak Lain">
+							<option value="Akan Dijual">
                         </datalist>
                         <datalist id="status-kendaraan-list">
                             <option value="Aktif / Digunakan">
@@ -678,6 +682,14 @@
                             <option value="Pajak/STNK Mati">
                             <option value="Dijual / Proses Lelang">
                         </datalist>
+						<datalist id="status-bangunan-list">
+    <option value="Takeover">
+    <option value="Dihuni">
+    <option value="Disewakan">
+    <option value="Kosong">
+    <option value="Mess">
+    <option value="Dalam Renovasi">
+</datalist>
                    </div>
                 </div>
 
@@ -2820,15 +2832,18 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
   }
 
   // Daftar saran status sesuai kategori
-  const statusInput = document.getElementById('form-status');
+   const statusInput = document.getElementById('form-status');
   if (statusInput) {
     statusInput.setAttribute(
       'list',
-      category === 'Kendaraan' ? 'status-kendaraan-list' : 'status-aset-suggestions'
+      category === 'Kendaraan' ? 'status-kendaraan-list'
+      : category === 'Bangunan' ? 'status-bangunan-list'
+      : 'status-aset-suggestions'
     );
-    statusInput.placeholder = (category === 'Kendaraan')
-      ? 'Ketik status kendaraan (misal: Aktif / Digunakan, Dalam Perbaikan)'
-      : 'Ketik status aset (misal: Sudah Bebas, Proses AJB, Terbangun)';
+    statusInput.placeholder =
+      category === 'Kendaraan' ? 'Ketik status kendaraan (misal: Aktif / Digunakan, Dalam Perbaikan)'
+      : category === 'Bangunan' ? 'Ketik status bangunan (misal: Takeover, Dihuni, Disewakan)'
+      : 'Ketik status aset (misal: Sudah Bebas, Tanah Kosong, Cadangan Lahan)';
   }
 }
 	// --- FUNGSI SALIN TEKS CEPAT ---
