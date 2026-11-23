@@ -2210,7 +2210,14 @@ const thLabel = document.getElementById('th-luas-label');
             (a.status && a.status.toLowerCase().includes(searchQuery)) || 
             (a.certNo && a.certNo.toLowerCase().includes(searchQuery)) ||
 					(a.legality && a.legality.toLowerCase().includes(searchQuery)) ||
-            (a.keterangan && a.keterangan.toLowerCase().includes(searchQuery)) ||
+                        (a.keterangan && a.keterangan.toLowerCase().includes(searchQuery)) ||
+            (a.merk && a.merk.toLowerCase().includes(searchQuery)) ||
+            (a.model && a.model.toLowerCase().includes(searchQuery)) ||
+            (a.warna && a.warna.toLowerCase().includes(searchQuery)) ||
+            (a.noRangka && a.noRangka.toLowerCase().includes(searchQuery)) ||
+            (a.noMesin && a.noMesin.toLowerCase().includes(searchQuery)) ||
+            (a.pemegang && a.pemegang.toLowerCase().includes(searchQuery)) ||
+            (a.bpkb && a.bpkb.toLowerCase().includes(searchQuery)) ||
             (a.owner && a.owner.toLowerCase().includes(searchQuery));
                 return matchesCat && matchesQuery;
             });
