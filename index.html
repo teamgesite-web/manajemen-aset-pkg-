@@ -2087,6 +2087,23 @@ if (isDuplicate) {
                                 <span class="text-slate-500">Pemegang / Pengguna</span>
                                 <span class="font-semibold text-slate-800 text-right">${asset.pemegang || '-'}</span>
                             </div>` : ''}
+							${asset.category === 'Bangunan' ? `
+<div class="p-3 flex justify-between gap-2">
+    <span class="text-slate-500">Tipe Bangunan</span>
+    <span class="font-semibold text-slate-800 text-right">${asset.tipeBangunan || '-'}</span>
+</div>
+<div class="p-3 flex justify-between gap-2">
+    <span class="text-slate-500">Blok</span>
+    <span class="font-semibold text-slate-800 text-right">${asset.blok || '-'}</span>
+</div>
+<div class="p-3 flex justify-between gap-2">
+    <span class="text-slate-500">Akta PPJB</span>
+    <span class="font-semibold text-right ${asset.aktaPPJB === 'Ada' ? 'text-emerald-600' : 'text-rose-600'}">${asset.aktaPPJB || 'Tidak'}</span>
+</div>
+<div class="p-3 flex justify-between gap-2">
+    <span class="text-slate-500">Akta Kuasa</span>
+    <span class="font-semibold text-right ${asset.aktaKuasa === 'Ada' ? 'text-emerald-600' : 'text-rose-600'}">${asset.aktaKuasa || 'Tidak'}</span>
+</div>` : ''}
                             <div class="p-3 flex justify-between gap-2">
                                 <span class="text-slate-500">${asset.category === 'Kendaraan' ? 'Plat Nomor (Nopol)' : 'Nomor Sertifikat'}</span>
                                 <span class="font-mono font-semibold text-blue-700 text-right">${asset.certNo || '-'}</span>
