@@ -2629,29 +2629,31 @@ if (!res.ok) {
   const dbRef = firebase.database().ref("peta_aset");
 
   // Fungsi simpan manual yang aman dari freeze
-  function persistToFirebase() {
+ function persistToFirebase() {
   const statusEl = document.getElementById('firebase-status');
-  if (statusEl) {
-    statusEl.innerText = "Status Firebase: Menyimpan...";
-    statusEl.style.color = "#f39c12"; // Warna kuning/oranye saat proses
-  }
+  const show = (text, color, autoHide) => {
+    if (!statusEl) return;
+    statusEl.style.display = 'block';
+    statusEl.innerText = text;
+    statusEl.style.color = color;
+    clearTimeout(statusEl._t);
+    if (autoHide) {
+      statusEl._t = setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    }
+  };
+
+  show("Status Firebase: Menyimpan...", "#f39c12", false);
 
   const dataObj = {};
   if (typeof assets !== 'undefined') {
-    assets.forEach(a => { if(a && a.id) dataObj[a.id] = a; });
-    
+    assets.forEach(a => { if (a && a.id) dataObj[a.id] = a; });
+
     firebase.database().ref("peta_aset").set(dataObj).then(() => {
       console.log("Data berhasil disinkronkan ke Firebase!");
-      if (statusEl) {
-        statusEl.innerText = "Status Firebase: Tersinkron (Online)";
-        statusEl.style.color = "#27ae60"; // Warna hijau jika berhasil
-      }
+      show("Status Firebase: Tersinkron (Online)", "#27ae60", true);
     }).catch(err => {
       console.log("Gagal sync:", err);
-      if (statusEl) {
-        statusEl.innerText = "Status Firebase: Gagal Sinkron!";
-        statusEl.style.color = "#c0392b"; // Warna merah jika gagal
-      }
+      show("Status Firebase: Gagal Sinkron!", "#c0392b", false);
     });
   }
 }
