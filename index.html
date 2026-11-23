@@ -2225,7 +2225,7 @@ const thLabel = document.getElementById('th-luas-label');
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
 
-            tbody.innerHTML = filtered.map(asset => {
+                        tbody.innerHTML = filtered.map((asset, index) => {
                 const isSelected = asset.id === selectedAssetId;
                 const color = getCategoryColor(asset.category);
 
@@ -2234,7 +2234,8 @@ const thLabel = document.getElementById('th-luas-label');
                         <td class="py-2 px-2 font-mono font-bold text-slate-800 whitespace-nowrap align-top">
                             <div class="flex items-center gap-1">
                                 <span class="w-2 h-2 rounded-full shrink-0" style="background:${color}"></span>
-                                <span>${asset.code}</span>
+                               <span class="text-[10px] font-sans font-semibold text-slate-400">${index + 1}.</span>
+<span>${asset.code}</span>
                                                         </div>
                             <span class="inline-block mt-0.5 text-[9px] font-sans font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">${asset.category}</span>
                             ${asset.category === 'Kendaraan' && asset.legality ? `<span class="inline-block mt-0.5 text-[9px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">${getJenisKendaraanLabel(asset.legality)}</span>` : ''}
