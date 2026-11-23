@@ -304,6 +304,14 @@
     <option value="Elektronik">Elektronik</option>
 </select>
 
+<select id="filter-jenis" onchange="renderAssetTable()" class="hidden bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="ALL">Semua Jenis</option>
+    <option value="Mobil">Mobil</option>
+    <option value="Motor">Motor</option>
+    <option value="Truk">Truk</option>
+    <option value="Alat Berat">Alat Berat</option>
+</select>
+
                     <button type="button" onclick="openAddAssetModal()" id="btn-table-add" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg items-center gap-1 shrink-0 shadow-sm">
                         <i class="fa-solid fa-plus"></i>
                         <span>Tambah</span>
@@ -2190,6 +2198,12 @@ if (isDuplicate) {
             const emptyState = document.getElementById('empty-state');
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const catFilter = document.getElementById('filter-category').value;
+			            const jenisEl = document.getElementById('filter-jenis');
+            if (jenisEl) {
+                jenisEl.classList.toggle('hidden', catFilter !== 'Kendaraan');
+                if (catFilter !== 'Kendaraan') jenisEl.value = 'ALL';
+            }
+            const jenisFilter = jenisEl ? jenisEl.value : 'ALL';
 const thLabel = document.getElementById('th-luas-label');
     if (thLabel) {
         thLabel.textContent = (catFilter === 'Kendaraan') ? 'Merk / Type' : 'Luas (m²)';
@@ -2201,8 +2215,9 @@ const thLabel = document.getElementById('th-luas-label');
     }
             const filtered = assets.filter(a => {
                                                 const matchesCat = (catFilter === 'ALL' || a.category === catFilter)
-                    && (!polygonMode || a.category === 'Tanah' || a.category === 'Bangunan')
-                    && (!certMode || ((a.category === 'Tanah' || a.category === 'Bangunan') && isSertifikatResmi(a)));
+    && (!polygonMode || a.category === 'Tanah' || a.category === 'Bangunan')
+    && (!certMode || ((a.category === 'Tanah' || a.category === 'Bangunan') && isSertifikatResmi(a)))
+    && (jenisFilter === 'ALL' || getJenisKendaraanLabel(a.legality) === jenisFilter);
                 const matchesQuery = !searchQuery || 
             (a.code && a.code.toLowerCase().includes(searchQuery)) || 
             (a.name && a.name.toLowerCase().includes(searchQuery)) || 
