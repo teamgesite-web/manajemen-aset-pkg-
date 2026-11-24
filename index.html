@@ -2225,7 +2225,7 @@ if (isDuplicate) {
                         <span class="text-slate-500">Harga Appraisal${asset.tglAppraisal ? ' (' + asset.tglAppraisal + ')' : ''}</span>
                         <span class="font-semibold text-emerald-700 text-right">${formatRupiah(asset.hargaAppraisal)}</span>
                     </div>
-					                    ${(asset.category !== 'Kendaraan' && asset.hargaAppraisal && asset.area) ? `
+					                   ${(asset.category === 'Tanah' && asset.hargaAppraisal && asset.area) ? `
                     <div class="p-3 flex justify-between gap-2">
                         <span class="text-slate-500">Harga per m²</span>
                         <span class="font-semibold text-slate-800 text-right">${formatRupiah(Math.round(asset.hargaAppraisal / asset.area))}</span>
