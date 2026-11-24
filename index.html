@@ -721,13 +721,13 @@
 <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3.5 space-y-3">
     <p class="font-semibold text-emerald-900">Nilai Appraisal</p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
+                <div id="wrap-harga-m2">
             <label class="block font-semibold text-slate-700 mb-1">Harga per m² (Rp) <span class="font-normal text-slate-400">- opsional</span></label>
             <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-m2" placeholder="Contoh: 3.000.000" oninput="formatRupiahInput(this); hitungAppraisalDariM2()" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <p class="text-[10px] text-slate-500 mt-1">Isi ini, maka total otomatis = harga/m² × Luas Area.</p>
         </div>
         <div>
-            <label class="block font-semibold text-slate-700 mb-1">Harga Appraisal Total (Rp)</label>
+            <label id="label-harga-total" class="block font-semibold text-slate-700 mb-1">Harga Appraisal Total (Rp)</label>
             <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-appraisal" placeholder="Contoh: 150.000.000" oninput="formatRupiahInput(this)" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
         </div>
         <div>
@@ -2903,6 +2903,21 @@ function generateNextAssetCode(prefix) {
 
 // Fungsi utama untuk mengubah label, placeholder, opsi dropdown, dan kode aset otomatis
 function handleCategoryChange() {
+	  // --- Form appraisal menyesuaikan kategori ---
+  (function () {
+    const kat = document.getElementById('form-category').value;
+    const wrapM2 = document.getElementById('wrap-harga-m2');
+    const labelTotal = document.getElementById('label-harga-total');
+    const inputM2 = document.getElementById('form-harga-m2');
+    if (wrapM2) wrapM2.style.display = (kat === 'Tanah') ? '' : 'none';
+    if (inputM2 && kat !== 'Tanah') inputM2.value = '';
+    if (labelTotal) {
+      labelTotal.textContent =
+        kat === 'Kendaraan' ? 'Nilai Pasar Kendaraan (Rp)'
+        : kat === 'Bangunan' ? 'Harga Rumah / Bangunan (Rp)'
+        : 'Harga Appraisal Total (Rp)';
+    }
+  })();
   const categorySelect = document.getElementById('form-category');
   if (!categorySelect) return;
   
