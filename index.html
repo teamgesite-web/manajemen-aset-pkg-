@@ -704,7 +704,17 @@
                         <input type="text" id="form-center" placeholder="-6.4825, 106.9532" class="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
-
+                <!-- Section 5b: Harga Appraisal -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Harga Appraisal (Rp)</label>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-appraisal" placeholder="Contoh: 150.000.000" oninput="formatRupiahInput(this)" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tanggal Appraisal</label>
+                        <input type="date" id="form-tgl-appraisal" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
                 <!-- Section 6: Tanggal Survei / Input -->
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Tanggal Survei / Input</label>
@@ -1196,6 +1206,13 @@ let drawingTriggeredFromModal = false;
     if (l.includes('alat berat')) return 'Alat Berat';
     return legality;
 }
+		function formatRupiahInput(el) {
+    const angka = el.value.replace(/\D/g, '');
+    el.value = angka ? Number(angka).toLocaleString('id-ID') : '';
+}
+function formatRupiah(n) {
+    return n ? 'Rp ' + Number(n).toLocaleString('id-ID') : '-';
+}
         function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
             if (category === 'Kendaraan') return '#f59e0b';  // kuning
@@ -1683,6 +1700,10 @@ const categoryEl = document.getElementById('form-category');
     if (document.getElementById('form-no-mesin')) document.getElementById('form-no-mesin').value = asset.noMesin || '';
     if (document.getElementById('form-pemegang')) document.getElementById('form-pemegang').value = asset.pemegang || '';
     if (document.getElementById('form-bpkb')) document.getElementById('form-bpkb').value = asset.bpkb || '';
+		      const elAppr = document.getElementById('form-harga-appraisal');
+    if (elAppr) elAppr.value = asset.hargaAppraisal ? Number(asset.hargaAppraisal).toLocaleString('id-ID') : '';
+    const elTglAppr = document.getElementById('form-tgl-appraisal');
+    if (elTglAppr) elTglAppr.value = asset.tglAppraisal || '';
 		      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
     setVal('form-tipe-bangunan', asset.tipeBangunan);
     setVal('form-blok', asset.blok);
@@ -1958,7 +1979,9 @@ if (isDuplicate) {
 				                tipeBangunan: document.getElementById('form-tipe-bangunan') ? document.getElementById('form-tipe-bangunan').value.trim() : '',
                 blok: document.getElementById('form-blok') ? document.getElementById('form-blok').value.trim() : '',
                 aktaPPJB: document.getElementById('form-akta-ppjb') ? document.getElementById('form-akta-ppjb').value : 'Tidak',
-                aktaKuasa: document.getElementById('form-akta-kuasa') ? document.getElementById('form-akta-kuasa').value : 'Tidak',
+                                aktaKuasa: document.getElementById('form-akta-kuasa') ? document.getElementById('form-akta-kuasa').value : 'Tidak',
+                hargaAppraisal: document.getElementById('form-harga-appraisal') ? (parseInt(document.getElementById('form-harga-appraisal').value.replace(/\D/g, '')) || 0) : 0,
+                tglAppraisal: document.getElementById('form-tgl-appraisal') ? document.getElementById('form-tgl-appraisal').value : '',
                 category: document.getElementById('form-category').value,
                 legality: document.getElementById('form-legality').value,
                                 certNo: document.getElementById('form-cert-no').value.trim(),
@@ -2117,7 +2140,11 @@ if (isDuplicate) {
                                 <span class="font-semibold ${asset.category === 'Kendaraan' ? 'text-slate-800' : 'text-amber-600'} text-right">
                                     ${asset.category === 'Kendaraan' ? (asset.legality || '-') : (polyCount >= 3 ? `${polyCount} Titik Sudut` : 'Belum ada poligon')}
                                 </span>
-                            </div>
+                                                       </div>
+                    <div class="p-3 flex justify-between gap-2">
+                        <span class="text-slate-500">Harga Appraisal${asset.tglAppraisal ? ' (' + asset.tglAppraisal + ')' : ''}</span>
+                        <span class="font-semibold text-emerald-700 text-right">${formatRupiah(asset.hargaAppraisal)}</span>
+                    </div>
                     <div class="p-3 flex justify-between gap-2">
                         <span class="text-slate-500">Tanggal Survei / Input</span>
                         <span class="font-medium text-slate-800">${asset.date || '-'}</span>
