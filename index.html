@@ -233,6 +233,7 @@
         <div class="min-w-0">
             <p class="text-[11px] text-slate-500 font-medium truncate">Total Nilai Appraisal</p>
             <p id="kpi-appraisal" class="text-lg font-extrabold text-teal-700 leading-tight truncate">Rp 0</p>
+			<p id="kpi-appraisal-detail" class="text-[10px] text-slate-500 leading-snug" style="white-space: normal;"></p>
             <p id="kpi-appraisal-sub" class="text-[10px] text-slate-400 truncate">0 dari 0 aset dinilai</p>
         </div>
     </div>
@@ -2363,12 +2364,27 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 
     // 4. Update Sertifikat Resmi hanya membandingkan dari Tanah & Bangunan (bukan Kendaraan)
     document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${validCertifiedAssets.length} Aset`;
-			    const dinilai = assets.filter(a => Number(a.hargaAppraisal) > 0);
+			        const dinilai = assets.filter(a => Number(a.hargaAppraisal) > 0);
     const totalAppraisal = dinilai.reduce((s, a) => s + Number(a.hargaAppraisal), 0);
+    const sumKategori = (kat) => dinilai
+        .filter(a => a.category === kat)
+        .reduce((s, a) => s + Number(a.hargaAppraisal), 0);
+    const nilaiTanah = sumKategori('Tanah');
+    const nilaiBangunan = sumKategori('Bangunan');
+    const nilaiKendaraan = sumKategori('Kendaraan');
+
     const elApp = document.getElementById('kpi-appraisal');
     if (elApp) {
         elApp.textContent = formatRupiahRingkas(totalAppraisal);
         elApp.title = formatRupiah(totalAppraisal);
+
+        const bagian = [];
+        if (nilaiTanah > 0) bagian.push(`Tanah ${formatRupiahRingkas(nilaiTanah)}`);
+        if (nilaiBangunan > 0) bagian.push(`Bangunan ${formatRupiahRingkas(nilaiBangunan)}`);
+        if (nilaiKendaraan > 0) bagian.push(`Kendaraan ${formatRupiahRingkas(nilaiKendaraan)}`);
+        const elDetail = document.getElementById('kpi-appraisal-detail');
+        if (elDetail) elDetail.textContent = bagian.join(' · ');
+
         document.getElementById('kpi-appraisal-sub').textContent = `${dinilai.length} dari ${assets.length} aset dinilai`;
     }
 		}
