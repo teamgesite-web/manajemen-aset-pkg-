@@ -166,7 +166,7 @@
     <!-- ==================== 5 KPI SUMMARY CARDS ==================== -->
     <div class="flex flex-col gap-2 w-full px-4 py-3">
        <!-- BARIS 1: KPI utama -->
-<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-3">
 
     <!-- Total Aset -->
     <div data-filter="all" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
@@ -225,7 +225,18 @@
         </div>
     </div>
 
-    <!-- Sertifikat Resmi -->
+       <!-- Total Nilai Appraisal -->
+    <div class="select-none flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="text-[11px] text-slate-500 font-medium truncate">Total Nilai Appraisal</p>
+            <p id="kpi-appraisal" class="text-lg font-extrabold text-teal-700 leading-tight truncate">Rp 0</p>
+            <p id="kpi-appraisal-sub" class="text-[10px] text-slate-400 truncate">0 dari 0 aset dinilai</p>
+        </div>
+    </div>
+	<!-- Sertifikat Resmi -->
     <div data-filter="sertifikat" class="kpi-card cursor-pointer select-none transition hover:-translate-y-0.5 hover:shadow-md flex items-center gap-3 bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-file-shield"></i>
@@ -705,16 +716,32 @@
                     </div>
                 </div>
                 <!-- Section 5b: Harga Appraisal -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Harga Appraisal (Rp)</label>
-                        <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-appraisal" placeholder="Contoh: 150.000.000" oninput="formatRupiahInput(this)" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Tanggal Appraisal</label>
-                        <input type="date" id="form-tgl-appraisal" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
+<div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3.5 space-y-3">
+    <p class="font-semibold text-emerald-900">Nilai Appraisal</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+            <label class="block font-semibold text-slate-700 mb-1">Harga per m² (Rp) <span class="font-normal text-slate-400">- opsional</span></label>
+            <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-m2" placeholder="Contoh: 3.000.000" oninput="formatRupiahInput(this); hitungAppraisalDariM2()" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <p class="text-[10px] text-slate-500 mt-1">Isi ini, maka total otomatis = harga/m² × Luas Area.</p>
+        </div>
+        <div>
+            <label class="block font-semibold text-slate-700 mb-1">Harga Appraisal Total (Rp)</label>
+            <input type="text" inputmode="numeric" autocomplete="off" id="form-harga-appraisal" placeholder="Contoh: 150.000.000" oninput="formatRupiahInput(this)" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
+        </div>
+        <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tanggal Appraisal</label>
+            <input type="date" id="form-tgl-appraisal" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block font-semibold text-slate-700 mb-1">Sumber Nilai</label>
+            <input type="text" id="form-sumber-nilai" placeholder="Riset harga pasar" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+    </div>
+    <div>
+        <label class="block font-semibold text-slate-700 mb-1">Catatan Appraisal</label>
+        <textarea id="form-catatan-appraisal" rows="2" placeholder="Harga pembanding, link iklan, dll..." class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+    </div>
+</div>
                 <!-- Section 6: Tanggal Survei / Input -->
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Tanggal Survei / Input</label>
@@ -1213,6 +1240,19 @@ let drawingTriggeredFromModal = false;
 function formatRupiah(n) {
     return n ? 'Rp ' + Number(n).toLocaleString('id-ID') : '-';
 }
+		function hitungAppraisalDariM2() {
+    const m2 = parseInt((document.getElementById('form-harga-m2').value || '').replace(/\D/g, '')) || 0;
+    const luas = parseFloat(document.getElementById('form-area').value) || 0;
+    const total = Math.round(m2 * luas);
+    document.getElementById('form-harga-appraisal').value = total ? total.toLocaleString('id-ID') : '';
+}
+function formatRupiahRingkas(n) {
+    n = Number(n) || 0;
+    if (n >= 1e12) return 'Rp ' + (n / 1e12).toFixed(2).replace('.', ',') + ' T';
+    if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(2).replace('.', ',') + ' M';
+    if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1).replace('.', ',') + ' jt';
+    return 'Rp ' + n.toLocaleString('id-ID');
+}
         function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
             if (category === 'Kendaraan') return '#f59e0b';  // kuning
@@ -1704,6 +1744,9 @@ const categoryEl = document.getElementById('form-category');
     if (elAppr) elAppr.value = asset.hargaAppraisal ? Number(asset.hargaAppraisal).toLocaleString('id-ID') : '';
     const elTglAppr = document.getElementById('form-tgl-appraisal');
     if (elTglAppr) elTglAppr.value = asset.tglAppraisal || '';
+		      document.getElementById('form-sumber-nilai').value = asset.sumberNilai || '';
+    document.getElementById('form-catatan-appraisal').value = asset.catatanAppraisal || '';
+    document.getElementById('form-harga-m2').value = '';
 		      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
     setVal('form-tipe-bangunan', asset.tipeBangunan);
     setVal('form-blok', asset.blok);
@@ -1982,6 +2025,8 @@ if (isDuplicate) {
                                 aktaKuasa: document.getElementById('form-akta-kuasa') ? document.getElementById('form-akta-kuasa').value : 'Tidak',
                 hargaAppraisal: document.getElementById('form-harga-appraisal') ? (parseInt(document.getElementById('form-harga-appraisal').value.replace(/\D/g, '')) || 0) : 0,
                 tglAppraisal: document.getElementById('form-tgl-appraisal') ? document.getElementById('form-tgl-appraisal').value : '',
+				                sumberNilai: document.getElementById('form-sumber-nilai').value.trim(),
+                catatanAppraisal: document.getElementById('form-catatan-appraisal').value.trim(),
                 category: document.getElementById('form-category').value,
                 legality: document.getElementById('form-legality').value,
                                 certNo: document.getElementById('form-cert-no').value.trim(),
@@ -2145,6 +2190,21 @@ if (isDuplicate) {
                         <span class="text-slate-500">Harga Appraisal${asset.tglAppraisal ? ' (' + asset.tglAppraisal + ')' : ''}</span>
                         <span class="font-semibold text-emerald-700 text-right">${formatRupiah(asset.hargaAppraisal)}</span>
                     </div>
+					                    ${(asset.category !== 'Kendaraan' && asset.hargaAppraisal && asset.area) ? `
+                    <div class="p-3 flex justify-between gap-2">
+                        <span class="text-slate-500">Harga per m²</span>
+                        <span class="font-semibold text-slate-800 text-right">${formatRupiah(Math.round(asset.hargaAppraisal / asset.area))}</span>
+                    </div>` : ''}
+                    ${asset.sumberNilai ? `
+                    <div class="p-3 flex justify-between gap-2">
+                        <span class="text-slate-500">Sumber Nilai</span>
+                        <span class="font-medium text-slate-800 text-right">${asset.sumberNilai}</span>
+                    </div>` : ''}
+                    ${asset.catatanAppraisal ? `
+                    <div class="p-3 flex justify-between gap-2">
+                        <span class="text-slate-500">Catatan Appraisal</span>
+                        <span class="font-medium text-slate-800 text-right">${asset.catatanAppraisal}</span>
+                    </div>` : ''}
                     <div class="p-3 flex justify-between gap-2">
                         <span class="text-slate-500">Tanggal Survei / Input</span>
                         <span class="font-medium text-slate-800">${asset.date || '-'}</span>
@@ -2285,6 +2345,14 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 
     // 4. Update Sertifikat Resmi hanya membandingkan dari Tanah & Bangunan (bukan Kendaraan)
     document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${validCertifiedAssets.length} Aset`;
+			    const dinilai = assets.filter(a => Number(a.hargaAppraisal) > 0);
+    const totalAppraisal = dinilai.reduce((s, a) => s + Number(a.hargaAppraisal), 0);
+    const elApp = document.getElementById('kpi-appraisal');
+    if (elApp) {
+        elApp.textContent = formatRupiahRingkas(totalAppraisal);
+        elApp.title = formatRupiah(totalAppraisal);
+        document.getElementById('kpi-appraisal-sub').textContent = `${dinilai.length} dari ${assets.length} aset dinilai`;
+    }
 		}
 		let polygonMode = false;
 		let certMode = false;   // true = hanya Tanah/Bangunan dengan SHM, SHGB, atau HGB
@@ -2469,6 +2537,10 @@ ${asset.category === 'Kendaraan' ? ((asset.merk || '-') + (asset.model ? '<br><s
                     'Dokumen Surat Tanah (PDF)': a.pdfFileName || '-',
                     'Link Google Drive PDF': a.pdfDriveUrl || (a.pdfFileName ? 'Tersimpan di Folder Google Drive' : '-'),
                     'Keterangan': a.notes || '-',
+					                    'Harga Appraisal (Rp)': Number(a.hargaAppraisal) || 0,
+                    'Tanggal Appraisal': a.tglAppraisal || '-',
+                    'Sumber Nilai': a.sumberNilai || '-',
+                    'Catatan Appraisal': a.catatanAppraisal || '-',
                     'Koordinat Poligon': a.polygon ? JSON.stringify(a.polygon) : '-'
                 }));
 
