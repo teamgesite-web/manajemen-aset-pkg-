@@ -222,7 +222,8 @@
         <div class="min-w-0">
             <p class="text-[11px] text-slate-500 font-medium truncate">Jumlah Kendaraan</p>
             <p id="kpi-kendaraan-count" class="text-lg font-extrabold text-amber-700 leading-tight">0 Unit</p>
-        </div>
+<p id="kpi-kendaraan-jenis" class="text-[10px] text-slate-400 truncate">-</p>
+</div>
     </div>
 
        <!-- Total Nilai Appraisal -->
@@ -1253,6 +1254,21 @@ function formatRupiahRingkas(n) {
     if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(2).replace('.', ',') + ' M';
     if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1).replace('.', ',') + ' jt';
     return 'Rp ' + n.toLocaleString('id-ID');
+}
+		function updateKendaraanJenis() {
+    const el = document.getElementById('kpi-kendaraan-jenis');
+    if (!el) return;
+    const hitung = {};
+    assets.filter(a => a.category === 'Kendaraan').forEach(a => {
+        const j = getJenisKendaraanLabel(a.legality) || 'Lainnya';
+        hitung[j] = (hitung[j] || 0) + 1;
+    });
+    const urutan = ['Mobil', 'Motor', 'Truk', 'Alat Berat'];
+    const kunci = urutan.filter(j => hitung[j])
+        .concat(Object.keys(hitung).filter(j => !urutan.includes(j)));
+    const teks = kunci.map(j => `${j} ${hitung[j]}`).join(' · ');
+    el.textContent = teks || '-';
+    el.title = teks;
 }
         function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
@@ -2358,9 +2374,10 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
     document.getElementById('kpi-bangunan-count').textContent = `${bangunanCount} Unit`;
     document.getElementById('kpi-bangunan-area').textContent = formatAreaCompact(bangunanArea);
 
-    // 3. Tampilkan jumlah Kendaraan ke kartu KPI Kendaraan
+        // 3. Tampilkan jumlah Kendaraan ke kartu KPI Kendaraan
     const elKendaraan = document.getElementById('kpi-kendaraan-count');
     if (elKendaraan) elKendaraan.textContent = `${kendaraanCount} Unit`;
+    updateKendaraanJenis();
 
     // 4. Update Sertifikat Resmi hanya membandingkan dari Tanah & Bangunan (bukan Kendaraan)
     document.getElementById('kpi-certified').textContent = `${certifiedCount} / ${validCertifiedAssets.length} Aset`;
