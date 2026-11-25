@@ -2428,6 +2428,7 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 		let polygonMode = false;
 		let certMode = false;   // true = hanya Tanah/Bangunan dengan SHM, SHGB, atau HGB
 		let appraisalMode = false;   // true = hanya aset yang belum punya nilai appraisal
+		let lastFilteredAssets = null;   // hasil filter terakhir, dipakai Export Excel
 
 function punyaPdf(a) {
     return Boolean(a.pdfFileName || a.pdfDriveUrl);
@@ -2553,7 +2554,8 @@ const thLabel = document.getElementById('th-luas-label');
                 return matchesCat && matchesQuery;
             });
 
-            if (filtered.length === 0) {
+                       lastFilteredAssets = filtered;
+			if (filtered.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 emptyState.classList.add('flex');
@@ -2663,50 +2665,64 @@ ${asset.category === 'Kendaraan' ? ((asset.merk || '-') + (asset.model ? '<br><s
         // ==========================================
         // 11. EXCEL (.XLSX) EXPORT & GOOGLE SHEETS / DRIVE SYNC
         // ==========================================
-        function exportToExcel() {
-            if (assets.length === 0) {
-                showToast('Tidak ada data aset untuk diexport.', 'warning');
+               function exportToExcel() {
+            const data = Array.isArray(lastFilteredAssets) ? lastFilteredAssets : assets;
+            if (data.length === 0) {
+                showToast('Tidak ada data sesuai filter untuk diexport.', 'warning');
                 return;
             }
 
             try {
-                const rows = assets.map((a, index) => ({
-                    'No': index + 1,
-                    'Kode Aset': a.code,
-                    'Atas Nama': a.name,
-                    'Kategori': a.category,
-                    'Status Legalitas': a.legality,
-                    'No. Sertifikat': a.certNo || '-',
-                    'Luas (m2)': Number(a.area) || 0,
-                    'Luas (Hektar)': Number(((Number(a.area) || 0) / 10000).toFixed(4)),
-                    'Status Aset': a.status || '-',
-                    'Alamat': a.location,
-                    'Koordinat Pusat': a.center || '-',
-                    'Tanggal Input': a.date || '-',
-                    'Dokumen Surat Tanah (PDF)': a.pdfFileName || '-',
-                    'Link Google Drive PDF': a.pdfDriveUrl || (a.pdfFileName ? 'Tersimpan di Folder Google Drive' : '-'),
-                    'Keterangan': a.notes || '-',
-					                    'Harga Appraisal (Rp)': Number(a.hargaAppraisal) || 0,
-                    'Tanggal Appraisal': a.tglAppraisal || '-',
-                    'Sumber Nilai': a.sumberNilai || '-',
-                    'Catatan Appraisal': a.catatanAppraisal || '-',
-                    'Koordinat Poligon': a.polygon ? JSON.stringify(a.polygon) : '-'
-                }));
+                const rows = data.map((a, index) => {
+                    const isKendaraan = a.category === 'Kendaraan';
+                    const luas = isKendaraan ? '' : (Number(a.area) || 0);
+                    return {
+                        'No': index + 1,
+                        'Kode Aset': a.code,
+                        'Atas Nama': a.name,
+                        'Kategori': a.category,
+                        'Status Legalitas / Jenis': a.legality || '-',
+                        'No. Sertifikat / Nopol': a.certNo || '-',
+                        'Luas (m2)': luas,
+                        'Luas (Hektar)': isKendaraan ? '' : Number(((Number(a.area) || 0) / 10000).toFixed(4)),
+                        'Status Aset': a.status || '-',
+                        'Alamat': a.location || '-',
+                        'Koordinat Pusat': a.center || '-',
+                        'Tipe Bangunan': a.tipeBangunan || '-',
+                        'Blok': a.blok || '-',
+                        'Akta PPJB': a.category === 'Bangunan' ? (a.aktaPPJB || 'Tidak') : '-',
+                        'Akta Kuasa': a.category === 'Bangunan' ? (a.aktaKuasa || 'Tidak') : '-',
+                        'Merk / Type': a.merk || '-',
+                        'Jenis Model': a.model || '-',
+                        'Tahun Pembuatan': a.tahunPembuatan || '-',
+                        'Warna': a.warna || '-',
+                        'CC': a.cc || '-',
+                        'No. Rangka': a.noRangka || '-',
+                        'No. Mesin': a.noMesin || '-',
+                        'Pemegang / Pengguna': a.pemegang || '-',
+                        'Nama di BPKB': a.bpkb || '-',
+                        'Harga Appraisal (Rp)': Number(a.hargaAppraisal) || 0,
+                        'Tanggal Appraisal': a.tglAppraisal || '-',
+                        'Sumber Nilai': a.sumberNilai || '-',
+                        'Catatan Appraisal': a.catatanAppraisal || '-',
+                        'Tanggal Input': a.date || '-',
+                        'Dokumen PDF': a.pdfFileName || '-',
+                        'Link Google Drive PDF': a.pdfDriveUrl || (a.pdfFileName ? 'Tersimpan di Folder Google Drive' : '-'),
+                        'Keterangan': a.notes || '-',
+                        'Koordinat Poligon': a.polygon ? JSON.stringify(a.polygon).slice(0, 32000) : '-'
+                    };
+                });
 
                 const worksheet = XLSX.utils.json_to_sheet(rows);
-                
-                worksheet['!cols'] = [
-                    { wch: 5 }, { wch: 12 }, { wch: 30 }, { wch: 14 }, { wch: 24 },
-                    { wch: 24 }, { wch: 15 }, { wch: 14 }, { wch: 22 }, { wch: 36 },
-                    { wch: 22 }, { wch: 14 }, { wch: 30 }, { wch: 36 }, { wch: 40 }, { wch: 40 }
-                ];
+                worksheet['!cols'] = Object.keys(rows[0]).map(() => ({ wch: 18 }));
 
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, 'Aset_Pesona_Kahuripan');
 
                 const dateStamp = new Date().toISOString().slice(0, 10);
-                XLSX.writeFile(workbook, `Aset_Pesona_Kahuripan_${dateStamp}.xlsx`);
-                showToast('File Excel (.xlsx) berhasil diunduh!', 'success');
+                const sufiks = (data.length !== assets.length) ? '_Filter' : '';
+                XLSX.writeFile(workbook, `Aset_Pesona_Kahuripan${sufiks}_${dateStamp}.xlsx`);
+                showToast(`File Excel berhasil diunduh (${data.length} aset).`, 'success');
             } catch (err) {
                 console.error(err);
                 showToast('Gagal membuat file Excel.', 'error');
