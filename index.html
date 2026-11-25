@@ -325,6 +325,11 @@
     <option value="Truk">Truk</option>
     <option value="Alat Berat">Alat Berat</option>
 </select>
+					<select id="filter-pdf" onchange="renderAssetTable()" class="hidden bg-white border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="ALL">Semua Dokumen</option>
+    <option value="ADA">Sudah ada PDF</option>
+    <option value="BELUM">Belum ada PDF</option>
+</select>
 
                     <button type="button" onclick="openAddAssetModal()" id="btn-table-add" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg items-center gap-1 shrink-0 shadow-sm">
                         <i class="fa-solid fa-plus"></i>
@@ -2416,7 +2421,10 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 		let certMode = false;   // true = hanya Tanah/Bangunan dengan SHM, SHGB, atau HGB
 		let appraisalMode = false;   // true = hanya aset yang belum punya nilai appraisal
 
-function belumDinilai(a) {
+function punyaPdf(a) {
+    return Boolean(a.pdfFileName || a.pdfDriveUrl);
+}
+		function belumDinilai(a) {
     return !(Number(a.hargaAppraisal) > 0);
 }
 
@@ -2464,6 +2472,12 @@ function updateBelumDinilaiButton() {
                 if (catFilter !== 'Kendaraan') jenisEl.value = 'ALL';
             }
             const jenisFilter = jenisEl ? jenisEl.value : 'ALL';
+			            const pdfEl = document.getElementById('filter-pdf');
+            if (pdfEl) {
+                pdfEl.classList.toggle('hidden', catFilter !== 'Tanah');
+                if (catFilter !== 'Tanah') pdfEl.value = 'ALL';
+            }
+            const pdfFilter = pdfEl ? pdfEl.value : 'ALL';
 const thLabel = document.getElementById('th-luas-label');
     if (thLabel) {
         thLabel.textContent = (catFilter === 'Kendaraan') ? 'Merk / Type' : 'Luas (m²)';
@@ -2478,6 +2492,7 @@ const thLabel = document.getElementById('th-luas-label');
     && (!polygonMode || (a.category === 'Tanah' && Array.isArray(a.polygon) && a.polygon.length >= 3))
     && (!certMode || ((a.category === 'Tanah' || a.category === 'Bangunan') && isSertifikatResmi(a)))
 													    && (!appraisalMode || belumDinilai(a))
+													    && (pdfFilter === 'ALL' || (pdfFilter === 'ADA' ? punyaPdf(a) : !punyaPdf(a)))
     && (jenisFilter === 'ALL' || getJenisKendaraanLabel(a.legality) === jenisFilter);
                 const matchesQuery = !searchQuery || 
             (a.code && a.code.toLowerCase().includes(searchQuery)) || 
