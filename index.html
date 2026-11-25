@@ -2495,7 +2495,9 @@ const thLabel = document.getElementById('th-luas-label');
             (a.noMesin && a.noMesin.toLowerCase().includes(searchQuery)) ||
             (a.pemegang && a.pemegang.toLowerCase().includes(searchQuery)) ||
             (a.bpkb && a.bpkb.toLowerCase().includes(searchQuery)) ||
-            (a.owner && a.owner.toLowerCase().includes(searchQuery));
+                        (a.owner && a.owner.toLowerCase().includes(searchQuery)) ||
+            (a.blok && String(a.blok).toLowerCase().includes(searchQuery)) ||
+            (a.tipeBangunan && String(a.tipeBangunan).toLowerCase().includes(searchQuery));
                 return matchesCat && matchesQuery;
             });
 
