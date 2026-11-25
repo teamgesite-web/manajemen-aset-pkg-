@@ -2191,6 +2191,15 @@ if (isDuplicate) {
                                 <span class="text-slate-500">Pemegang / Pengguna</span>
                                 <span class="font-semibold text-slate-800 text-right">${asset.pemegang || '-'}</span>
                             </div>` : ''}
+														${asset.category === 'Kendaraan' ? `
+                            <div class="p-3 flex justify-between gap-2">
+                                <span class="text-slate-500">Merk / Type</span>
+                                <span class="font-semibold text-slate-800 text-right">${asset.merk || '-'}</span>
+                            </div>
+                            <div class="p-3 flex justify-between gap-2">
+                                <span class="text-slate-500">Jenis Model / Kendaraan</span>
+                                <span class="font-semibold text-slate-800 text-right">${asset.model || '-'}</span>
+                            </div>` : ''}
 							${asset.category === 'Bangunan' ? `
 <div class="p-3 flex justify-between gap-2">
     <span class="text-slate-500">Tipe Bangunan</span>
@@ -2241,10 +2250,7 @@ if (isDuplicate) {
                         <span class="text-slate-500">Catatan Appraisal</span>
                         <span class="font-medium text-slate-800 text-right">${asset.catatanAppraisal}</span>
                     </div>` : ''}
-                    <div class="p-3 flex justify-between gap-2">
-                        <span class="text-slate-500">Tanggal Survei / Input</span>
-                        <span class="font-medium text-slate-800">${asset.date || '-'}</span>
-                    </div>
+                   
                 </div>
 
                 <!-- Dokumen Legalitas / Surat Tanah (PDF & Google Drive) -->
