@@ -600,7 +600,7 @@
             <input type="text" id="form-warna" placeholder="Hitam Metalik" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: 600;">Isi Silinder (CC)</label>
+            <label id="label-cc" style="font-size: 12px; font-weight: 600;">Isi Silinder (CC)</label>
             <input type="text" id="form-cc" placeholder="1500 CC" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
         </div>
     </div>
@@ -624,7 +624,7 @@
             <input type="text" id="form-pemegang" placeholder="Nama Pemegang" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: 600;">Nama Pemilik di BPKB</label>
+            <label id="label-bpkb" style="font-size: 12px; font-weight: 600;">Nama Pemilik di BPKB</label>
            <input type="text" id="form-bpkb" placeholder="Nama sesuai BPKB" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
                </div>
     </div>
@@ -665,7 +665,7 @@
 
                     <div>
                         <label id="label-legalitas" class="block font-semibold text-slate-700 mb-1">Status Legalitas</label>
-                        <select id="form-legality" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       <select id="form-legality" onchange="updateLabelAlatBerat()" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="SHM (Sertifikat Hak Milik)">SHM (Sertifikat Hak Milik)</option>
                             <option value="HGB (Hak Guna Bangunan)">HGB (Hak Guna Bangunan)</option>
                             <option value="Hak Pakai">Hak Pakai</option>
@@ -1284,7 +1284,20 @@ function formatRupiahRingkas(n) {
     el.textContent = teks || '-';
     el.title = teks;
 }
-        function getCategoryColor(category) {
+        function updateLabelAlatBerat() {
+    const cat = document.getElementById('form-category').value;
+    const jenis = document.getElementById('form-legality').value;
+    const alat = (cat === 'Kendaraan' && jenis === 'Alat Berat');
+    const set = (id, teks) => { const el = document.getElementById(id); if (el) el.innerText = teks; };
+    const ph = (id, teks) => { const el = document.getElementById(id); if (el) el.placeholder = teks; };
+    if (cat !== 'Kendaraan') return;
+    set('label-no-dokumen', alat ? 'Nomor Seri Unit / PIN' : 'Nomor Polisi (Nopol)');
+    ph('form-cert-no', alat ? 'Contoh: CAT0320D-12345' : 'Contoh: B 1234 ABC');
+    set('label-cc', alat ? 'Daya Mesin / Kapasitas' : 'Isi Silinder (CC)');
+    ph('form-cc', alat ? '110 HP' : '1500 CC');
+    set('label-bpkb', alat ? 'Nama Pemilik di Dokumen' : 'Nama Pemilik di BPKB');
+}
+		function getCategoryColor(category) {
             if (category === 'Bangunan') return '#3b82f6';   // biru
             if (category === 'Kendaraan') return '#f59e0b';  // kuning
             return '#10b981';                                 // hijau (Tanah & lainnya)
@@ -1843,8 +1856,9 @@ handleCategoryChange();
         if (asset.legality && ![...legalitySelect.options].some(o => o.value === asset.legality)) {
             legalitySelect.add(new Option(asset.legality, asset.legality));
         }
-        legalitySelect.value = asset.legality || legalitySelect.value;
+                legalitySelect.value = asset.legality || legalitySelect.value;
     }
+    updateLabelAlatBerat();
 }
         function closeAssetFormModal() {
             document.getElementById('asset-form-modal').classList.add('hidden');
@@ -3143,8 +3157,10 @@ const kendaraanFields = document.getElementById('kendaraan-fields');
     statusInput.placeholder =
       category === 'Kendaraan' ? 'Ketik status kendaraan (misal: Aktif / Digunakan, Dalam Perbaikan)'
       : category === 'Bangunan' ? 'Ketik status bangunan (misal: Takeover, Dihuni, Disewakan)'
-      : 'Ketik status aset (misal: Sudah Bebas, Tanah Kosong, Cadangan Lahan)';
+            : 'Ketik status aset (misal: Sudah Bebas, Tanah Kosong, Cadangan Lahan)';
   }
+
+  updateLabelAlatBerat();
 }
 	// --- FUNGSI SALIN TEKS CEPAT ---
 function salinTeks(teks) {
