@@ -236,6 +236,7 @@
             <p id="kpi-appraisal" class="text-lg font-extrabold text-teal-700 leading-tight truncate">Rp 0</p>
 			<p id="kpi-appraisal-detail" class="text-[10px] text-slate-500 leading-snug" style="white-space: normal;"></p>
             <p id="kpi-appraisal-sub" class="text-[10px] text-slate-400 truncate">0 dari 0 aset dinilai</p>
+			            <button type="button" id="btn-belum-dinilai" onclick="toggleAppraisalFilter()" class="mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200 transition">0 belum dinilai - klik untuk lihat</button>
         </div>
     </div>
 	<!-- Sertifikat Resmi -->
@@ -2334,6 +2335,7 @@ if (isDuplicate) {
         }
 
         function renderKPIs() {
+			    updateBelumDinilaiButton();
            const totalUnits = assets.length;
 
     // Hitung data Tanah terlebih dahulu di atas
@@ -2407,6 +2409,40 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 		}
 		let polygonMode = false;
 		let certMode = false;   // true = hanya Tanah/Bangunan dengan SHM, SHGB, atau HGB
+		let appraisalMode = false;   // true = hanya aset yang belum punya nilai appraisal
+
+function belumDinilai(a) {
+    return !(Number(a.hargaAppraisal) > 0);
+}
+
+function toggleAppraisalFilter() {
+    appraisalMode = !appraisalMode;
+    // filter ini tidak digabung dengan mode poligon / sertifikat
+    if (appraisalMode) {
+        polygonMode = false;
+        certMode = false;
+        document.querySelectorAll('.kpi-card').forEach(c => {
+            KPI_ACTIVE_CLASSES.forEach(cls => c.classList.remove(cls));
+        });
+    }
+    const search = document.getElementById('search-input');
+    if (search) search.value = '';
+    updateBelumDinilaiButton();
+    renderAssetTable();
+}
+
+function updateBelumDinilaiButton() {
+    const btn = document.getElementById('btn-belum-dinilai');
+    if (!btn) return;
+    const jumlah = assets.filter(belumDinilai).length;
+    if (appraisalMode) {
+        btn.textContent = 'Tampilkan semua aset (klik untuk reset)';
+        btn.className = 'mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-600 text-white border border-orange-700 hover:bg-orange-700 transition';
+    } else {
+        btn.textContent = `${jumlah} belum dinilai - klik untuk lihat`;
+        btn.className = 'mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200 transition';
+    }
+}
 
 		function isSertifikatResmi(a) {
 			const l = (a.legality || '').toUpperCase();
@@ -2436,6 +2472,7 @@ const thLabel = document.getElementById('th-luas-label');
                                                 const matchesCat = (catFilter === 'ALL' || a.category === catFilter)
     && (!polygonMode || (a.category === 'Tanah' && Array.isArray(a.polygon) && a.polygon.length >= 3))
     && (!certMode || ((a.category === 'Tanah' || a.category === 'Bangunan') && isSertifikatResmi(a)))
+													    && (!appraisalMode || belumDinilai(a))
     && (jenisFilter === 'ALL' || getJenisKendaraanLabel(a.legality) === jenisFilter);
                 const matchesQuery = !searchQuery || 
             (a.code && a.code.toLowerCase().includes(searchQuery)) || 
@@ -2479,6 +2516,7 @@ const thLabel = document.getElementById('th-luas-label');
 <span>${asset.code}</span>
                                                         </div>
                             <span class="inline-block mt-0.5 text-[9px] font-sans font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">${asset.category}</span>
+							                            ${belumDinilai(asset) ? `<span class="inline-block mt-0.5 text-[9px] font-sans font-semibold px-1.5 py-0.2 rounded bg-orange-100 text-orange-700 border border-orange-300">Belum dinilai</span>` : ''}
                             ${asset.category === 'Kendaraan' && asset.legality ? `<span class="inline-block mt-0.5 text-[9px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">${getJenisKendaraanLabel(asset.legality)}</span>` : ''}
                         </td>
                         <td class="py-2 px-2 align-top max-w-[135px]">
@@ -3183,6 +3221,8 @@ const KPI_TO_CATEGORY = {
 const KPI_ACTIVE_CLASSES = ['ring-2', 'ring-blue-500', 'bg-blue-50'];
 
 function applyKpiFilter(key) {
+	  appraisalMode = false;
+  updateBelumDinilaiButton();
   const select = document.getElementById('filter-category');
   if (!select) return;
 
