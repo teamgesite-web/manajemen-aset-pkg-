@@ -435,7 +435,17 @@
                 <button type="button" onclick="cancelMapPolygonDrawing()" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded-lg font-medium text-[11px] ml-2">Batal</button>
             </div>
 
-            <!-- Leaflet Map Container -->
+                        <!-- Banner Mode Edit Titik Poligon -->
+            <div id="edit-poly-banner" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-20 bg-slate-900/95 text-white px-4 py-2.5 rounded-2xl shadow-2xl border-2 border-amber-500 flex items-center gap-3 text-xs backdrop-blur">
+                <i class="fa-solid fa-vector-square text-amber-400 text-base"></i>
+                <div>
+                    <p class="font-semibold">Mode Edit Titik Poligon</p>
+                    <p class="text-[11px] text-slate-300">Geser titik sudut. Tarik titik tengah garis untuk menambah sudut. Klik Selesai bila sudah pas.</p>
+                </div>
+                <button type="button" onclick="finishEditPolygon()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg font-medium text-[11px] ml-2">Selesai</button>
+                <button type="button" onclick="cancelEditPolygon()" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded-lg font-medium text-[11px]">Batal</button>
+            </div>
+			<!-- Leaflet Map Container -->
             <div id="map" class="w-full h-full bg-slate-900"></div>
 
             <!-- Bottom Map Status Bar (Coordinates & Legend) -->
@@ -538,6 +548,10 @@
                             <button type="button" onclick="drawPolygonFromModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5">
                                 <i class="fa-solid fa-pen-ruler text-emerald-400"></i>
                                 <span>Gambar di Peta</span>
+                            </button>
+							                            <button type="button" onclick="startEditPolygon()" class="bg-amber-600 hover:bg-amber-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                                <i class="fa-solid fa-vector-square"></i>
+                                <span>Edit Titik di Peta</span>
                             </button>
                         </div>
                     </div>
@@ -699,7 +713,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label id="label-luas" class="block font-semibold text-slate-700 mb-1">Luas Area (m²) <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" id="form-area" required placeholder="0" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-emerald-700">
+                        <input type="number" step="0.01" id="form-area" oninput="updateLuasPetaInfo()" required placeholder="0" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-emerald-700">
+						                        <p id="luas-peta-info" class="hidden mt-1 text-[11px] text-slate-600">
+                            <span id="luas-peta-teks"></span>
+                            <button type="button" onclick="pakaiLuasPeta()" class="ml-1 text-blue-700 font-semibold underline">Pakai luas peta</button>
+                        </p>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">STATUS ASET <span class="text-rose-500">*</span></label>
@@ -1777,6 +1795,7 @@ function formatRupiahRingkas(n) {
             clearSelectedPDF();
             document.getElementById('form-id').value = '';
 			            clearFoto();
+			            updateLuasPetaInfo();
             document.getElementById('modal-form-title').textContent = 'Tambah Data Aset Baru';
             
             const kategoriVal = document.getElementById('form-category').value;
@@ -1847,6 +1866,7 @@ handleCategoryChange();
     document.getElementById('form-pdf-drive-url').value = asset.pdfDriveUrl || '';
     document.getElementById('form-notes').value = asset.notes || '';
     document.getElementById('form-polygon-coords').value = asset.polygon ? JSON.stringify(asset.polygon) : '';
+		      updateLuasPetaInfo();
 
     if (asset.pdfFileName || asset.pdfBase64) {
         currentFormPDF = {
@@ -2487,7 +2507,136 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 		let appraisalMode = false;   // true = hanya aset yang belum punya nilai appraisal
 		let lastFilteredAssets = null;   // hasil filter terakhir, dipakai Export Excel
 
-// ===== FOTO KENDARAAN =====
+// ===== EDIT TITIK POLIGON =====
+let editPolyLayer = null;       // layer poligon yang sedang diedit
+let editPolyOriginal = null;    // salinan koordinat asli (untuk Batal)
+
+function startEditPolygon() {
+    if (!isAdmin) {
+        showToast('Masuk sebagai Admin untuk mengedit poligon.', 'warning');
+        return;
+    }
+    if (!map || !drawnItems) return;
+
+    let coords = [];
+    try {
+        coords = JSON.parse(document.getElementById('form-polygon-coords').value.trim() || '[]');
+    } catch (e) {
+        coords = [];
+    }
+    if (!Array.isArray(coords) || coords.length < 3) {
+        showToast('Aset ini belum punya poligon. Gunakan "Gambar di Peta" atau upload KML.', 'warning');
+        return;
+    }
+
+    // Tutup form sementara (data form tetap tersimpan di isian)
+    closeAssetFormModal();
+
+    // Hentikan mode edit sebelumnya jika ada
+    if (editPolyLayer) {
+        drawnItems.removeLayer(editPolyLayer);
+        editPolyLayer = null;
+    }
+
+    editPolyOriginal = JSON.parse(JSON.stringify(coords));
+    editPolyLayer = L.polygon(coords, {
+        color: '#f59e0b',
+        weight: 3,
+        fillOpacity: 0.25
+    });
+    drawnItems.addLayer(editPolyLayer);
+
+    // Aktifkan pegangan titik (library Leaflet Draw)
+    if (editPolyLayer.editing) editPolyLayer.editing.enable();
+
+    map.fitBounds(editPolyLayer.getBounds(), { padding: [60, 60], maxZoom: 19 });
+    document.getElementById('edit-poly-banner').classList.remove('hidden');
+}
+
+function endEditPolygonUI() {
+    if (editPolyLayer) {
+        if (editPolyLayer.editing) editPolyLayer.editing.disable();
+        drawnItems.removeLayer(editPolyLayer);
+    }
+    editPolyLayer = null;
+    editPolyOriginal = null;
+    document.getElementById('edit-poly-banner').classList.add('hidden');
+    document.getElementById('asset-form-modal').classList.remove('hidden');
+    document.getElementById('asset-form-modal').classList.add('flex');
+}
+
+function finishEditPolygon() {
+    if (!editPolyLayer) return;
+    const latlngs = editPolyLayer.getLatLngs()[0] || [];
+    const coords = latlngs.map(ll => [Number(ll.lat.toFixed(6)), Number(ll.lng.toFixed(6))]);
+
+    if (coords.length < 3) {
+        showToast('Poligon minimal 3 titik.', 'error');
+        return;
+    }
+
+    const centroid = calculatePolygonCentroid(coords);
+    endEditPolygonUI();
+
+    // Koordinat dan titik pusat diperbarui. Luas TIDAK diubah otomatis.
+    document.getElementById('form-polygon-coords').value = JSON.stringify(coords);
+    document.getElementById('form-center').value = `${centroid[0].toFixed(5)}, ${centroid[1].toFixed(5)}`;
+    document.getElementById('polygon-parse-status').innerHTML =
+        `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span class="text-emerald-700 font-medium">Poligon diedit (${coords.length} titik). Klik Simpan untuk menyimpan.</span>`;
+    if (typeof updateLuasPetaInfo === 'function') updateLuasPetaInfo();
+    showToast('Poligon diperbarui. Luas tidak diubah, cek keterangan luas peta di form.', 'success');
+}
+
+function cancelEditPolygon() {
+    endEditPolygonUI();
+    showToast('Edit poligon dibatalkan. Poligon lama tetap utuh.', 'info');
+}
+// ===== AKHIR EDIT TITIK POLIGON =====
+		
+function hitungLuasPetaDariForm() {
+    try {
+        const coords = JSON.parse(document.getElementById('form-polygon-coords').value.trim() || '[]');
+        if (!Array.isArray(coords) || coords.length < 3) return 0;
+        return Math.round(calculateGeodesicArea(coords));
+    } catch (e) {
+        return 0;
+    }
+}
+
+function updateLuasPetaInfo() {
+    const box = document.getElementById('luas-peta-info');
+    const teks = document.getElementById('luas-peta-teks');
+    if (!box || !teks) return;
+
+    const kategori = document.getElementById('form-category').value;
+    const luasPeta = hitungLuasPetaDariForm();
+    if (kategori === 'Kendaraan' || !luasPeta) {
+        box.classList.add('hidden');
+        return;
+    }
+
+    const luasIsian = parseFloat(document.getElementById('form-area').value) || 0;
+    const selisih = Math.round(luasPeta - luasIsian);
+    let ket = `Luas hitung peta: ${formatNumber(luasPeta)} m²`;
+    if (luasIsian > 0 && selisih !== 0) {
+        ket += ` (berbeda ${formatNumber(Math.abs(selisih))} m² dari isian)`;
+    } else if (luasIsian > 0) {
+        ket += ' (sama dengan isian)';
+    }
+    teks.textContent = ket;
+    box.classList.remove('hidden');
+    const tombol = box.querySelector('button');
+    if (tombol) tombol.style.display = (luasIsian > 0 && selisih === 0) ? 'none' : '';
+}
+
+function pakaiLuasPeta() {
+    const luasPeta = hitungLuasPetaDariForm();
+    if (!luasPeta) return;
+    document.getElementById('form-area').value = luasPeta;
+    updateLuasPetaInfo();
+    showToast(`Luas diisi dari hitungan peta: ${formatNumber(luasPeta)} m²`, 'success');
+}
+		// ===== FOTO KENDARAAN =====
 let currentFotoBase64 = '';   // foto baru yang dipilih (belum diunggah)
 
 function handleFotoSelect(event) {
