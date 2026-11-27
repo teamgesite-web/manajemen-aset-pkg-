@@ -628,6 +628,21 @@
            <input type="text" id="form-bpkb" placeholder="Nama sesuai BPKB" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
                </div>
     </div>
+	      <!-- Foto Kendaraan -->
+    <div style="margin-top: 12px;">
+        <label style="font-size: 12px; font-weight: 600;">Foto Kendaraan</label>
+        <input type="hidden" id="form-foto-url">
+        <input type="hidden" id="form-foto-link">
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+            <label style="cursor: pointer; background: #2563eb; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 8px;">
+                📷 Pilih Foto
+                <input type="file" id="form-foto-file" accept="image/*" style="display: none;" onchange="handleFotoSelect(event)">
+            </label>
+            <button type="button" onclick="clearFoto()" style="font-size: 12px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff;">Hapus Foto</button>
+            <span id="foto-status" style="font-size: 11px; color: #64748b;">Belum ada foto</span>
+        </div>
+        <img id="foto-preview" alt="Pratinjau foto" style="display: none; margin-top: 8px; max-width: 220px; max-height: 160px; border-radius: 8px; border: 1px solid #cbd5e1;">
+    </div>
 </div>
 
 <!-- Container Data Bangunan -->
@@ -1760,6 +1775,7 @@ function formatRupiahRingkas(n) {
             document.getElementById('asset-form').reset();
             clearSelectedPDF();
             document.getElementById('form-id').value = '';
+			            clearFoto();
             document.getElementById('modal-form-title').textContent = 'Tambah Data Aset Baru';
             
             const kategoriVal = document.getElementById('form-category').value;
@@ -1784,6 +1800,11 @@ handleCategoryChange();
 
     clearSelectedPDF();
     document.getElementById('form-id').value = asset.id;
+		      currentFotoBase64 = '';
+    document.getElementById('form-foto-url').value = asset.fotoUrl || '';
+    document.getElementById('form-foto-link').value = asset.fotoLink || '';
+    document.getElementById('foto-status').textContent = asset.fotoUrl ? 'Foto tersimpan di Google Drive' : 'Belum ada foto';
+    tampilkanPreviewFoto(asset.fotoUrl || '');
     document.getElementById('modal-form-title').textContent = `Edit Aset - ${asset.code}`;
 
     // Data dasar & atribut kendaraan
@@ -2018,7 +2039,7 @@ handleCategoryChange();
             showToast(`Mengirim dokumen PDF ${asset.code} ke folder Google Drive...`, 'info');
         }
 
-        function saveAssetForm(event) {
+        async function saveAssetForm(event) {
             event.preventDefault();
             if (!isAdmin) return;
 
@@ -2087,6 +2108,8 @@ if (isDuplicate) {
                                 aktaKuasa: document.getElementById('form-akta-kuasa') ? document.getElementById('form-akta-kuasa').value : 'Tidak',
                 hargaAppraisal: document.getElementById('form-harga-appraisal') ? (parseInt(document.getElementById('form-harga-appraisal').value.replace(/\D/g, '')) || 0) : 0,
                 tglAppraisal: document.getElementById('form-tgl-appraisal') ? document.getElementById('form-tgl-appraisal').value : '',
+				                fotoUrl: document.getElementById('form-foto-url').value,
+                fotoLink: document.getElementById('form-foto-link').value,
 				                sumberNilai: document.getElementById('form-sumber-nilai').value.trim(),
                 catatanAppraisal: document.getElementById('form-catatan-appraisal').value.trim(),
                 category: document.getElementById('form-category').value,
@@ -2107,7 +2130,20 @@ if (isDuplicate) {
                 polygon: parsedPolygon
             };
 
-            if (existingId) {
+                        // Unggah foto kendaraan baru ke Google Drive (jika ada)
+            if (currentFotoBase64 && assetData.category === 'Kendaraan') {
+                try {
+                    showToast('Mengunggah foto kendaraan...', 'info');
+                    const hasilFoto = await uploadFotoKeDrive(assetData.code, currentFotoBase64);
+                    assetData.fotoUrl = hasilFoto.fotoUrl;
+                    assetData.fotoLink = hasilFoto.fotoLink;
+                    currentFotoBase64 = '';
+                } catch (errFoto) {
+                    console.error(errFoto);
+                    showToast('Foto gagal diunggah: ' + errFoto.message + '. Data lain tetap disimpan.', 'error');
+                }
+            }
+			if (existingId) {
                 const idx = assets.findIndex(a => a.id === existingId);
                 if (idx !== -1) assets[idx] = assetData;
                 showToast(`Data aset ${assetData.code} berhasil diperbarui!`, 'success');
@@ -2192,7 +2228,12 @@ if (isDuplicate) {
                     </p>
                 </div>
 
-                <!-- Highlight Metrics Grid -->
+                                ${asset.category === 'Kendaraan' ? (asset.fotoUrl ? `
+                <a href="${asset.fotoLink || asset.fotoUrl}" target="_blank" rel="noopener" title="Klik untuk memperbesar">
+                    <img src="${asset.fotoUrl}" alt="Foto ${asset.code}" style="width:100%; max-height:240px; object-fit:cover; border-radius:12px; border:1px solid #e2e8f0;">
+                </a>` : `
+                <div style="padding:14px; text-align:center; font-size:12px; color:#94a3b8; border:1px dashed #cbd5e1; border-radius:12px;">Belum ada foto kendaraan</div>`) : ''}
+				<!-- Highlight Metrics Grid -->
                 <div class="grid grid-cols-2 gap-3">
                     ${asset.category !== 'Kendaraan' ? `
     <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3">
@@ -2445,7 +2486,67 @@ const totalArea = tanahBerpoligon.reduce((sum, a) => sum + (Number(a.area) || 0)
 		let appraisalMode = false;   // true = hanya aset yang belum punya nilai appraisal
 		let lastFilteredAssets = null;   // hasil filter terakhir, dipakai Export Excel
 
-function punyaPdf(a) {
+// ===== FOTO KENDARAAN =====
+let currentFotoBase64 = '';   // foto baru yang dipilih (belum diunggah)
+
+function handleFotoSelect(event) {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showToast('File harus berupa gambar.', 'error');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            const maxSisi = 1200;
+            let w = img.width, h = img.height;
+            if (w > h && w > maxSisi) { h = Math.round(h * maxSisi / w); w = maxSisi; }
+            else if (h >= w && h > maxSisi) { w = Math.round(w * maxSisi / h); h = maxSisi; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            currentFotoBase64 = dataUrl.split(',')[1];
+            tampilkanPreviewFoto(dataUrl);
+            document.getElementById('foto-status').textContent = 'Foto baru siap diunggah saat Simpan';
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function tampilkanPreviewFoto(src) {
+    const prev = document.getElementById('foto-preview');
+    if (!prev) return;
+    if (src) { prev.src = src; prev.style.display = 'block'; }
+    else { prev.removeAttribute('src'); prev.style.display = 'none'; }
+}
+
+function clearFoto() {
+    currentFotoBase64 = '';
+    document.getElementById('form-foto-url').value = '';
+    document.getElementById('form-foto-link').value = '';
+    document.getElementById('foto-status').textContent = 'Belum ada foto';
+    tampilkanPreviewFoto('');
+}
+
+async function uploadFotoKeDrive(code, base64) {
+    const res = await callApi({
+        action: 'uploadFoto',
+        token: adminToken,
+        code: code,
+        fotoBase64: base64,
+        driveFolderName: localStorage.getItem(GDRIVE_FOLDER_KEY) || 'Dokumen_Aset_Pesona_Kahuripan'
+    });
+    if (!res.ok) throw new Error(res.error || res.message || 'Upload foto gagal.');
+    return res;
+}
+// ===== AKHIR FOTO KENDARAAN =====
+		function punyaPdf(a) {
     return Boolean(a.pdfFileName || a.pdfDriveUrl);
 }
 		function belumDinilai(a) {
@@ -2715,6 +2816,7 @@ ${asset.category === 'Kendaraan' ? ((asset.merk || '-') + (asset.model ? '<br><s
                         'No. Rangka': a.noRangka || '-',
                         'No. Mesin': a.noMesin || '-',
                         'Pemegang / Pengguna': a.pemegang || '-',
+						                        'Link Foto Kendaraan': a.fotoLink || '-',
                         'Nama di BPKB': a.bpkb || '-',
                         'Harga Appraisal (Rp)': Number(a.hargaAppraisal) || 0,
                         'Tanggal Appraisal': a.tglAppraisal || '-',
