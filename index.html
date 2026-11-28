@@ -2145,7 +2145,7 @@ if (isDuplicate) {
                 date: document.getElementById('form-date').value,
                 pdfFileName: currentFormPDF.fileName || (existingAsset?.pdfFileName || ''),
                 pdfFileSize: currentFormPDF.fileSize || (existingAsset?.pdfFileSize || 0),
-                pdfBase64: localBase64,
+                pdfBase64: '',
                 pdfDriveUrl: manualDriveUrl || (existingAsset?.pdfDriveUrl || ''),
                 notes: document.getElementById('form-notes').value.trim(),
                 polygon: parsedPolygon
@@ -2174,7 +2174,7 @@ if (isDuplicate) {
             }
 
             saveAssetsToStorage();
-		persistToFirebase();
+				persistToFirebase(assetData.id);
             closeAssetFormModal();
             selectedAssetId = assetData.id;
             renderAll();
@@ -3161,7 +3161,7 @@ if (!res.ok) {
   const dbRef = firebase.database().ref("peta_aset");
 
   // Fungsi simpan manual yang aman dari freeze
- function persistToFirebase() {
+ function persistToFirebase(changedId) {
   const statusEl = document.getElementById('firebase-status');
   const show = (text, color, autoHide) => {
     if (!statusEl) return;
@@ -3174,22 +3174,35 @@ if (!res.ok) {
     }
   };
 
+  if (typeof assets === 'undefined') return;
   show("Status Firebase: Menyimpan...", "#f39c12", false);
 
-  const dataObj = {};
-  if (typeof assets !== 'undefined') {
-    assets.forEach(a => { if (a && a.id) dataObj[a.id] = a; });
+  // Tanpa isi PDF (file PDF ada di Google Drive)
+  const bersih = (a) => {
+    const c = Object.assign({}, a);
+    delete c.pdfBase64;
+    return c;
+  };
 
-    firebase.database().ref("peta_aset").set(dataObj).then(() => {
-      console.log("Data berhasil disinkronkan ke Firebase!");
-      show("Status Firebase: Tersinkron (Online)", "#27ae60", true);
-    }).catch(err => {
-      console.log("Gagal sync:", err);
-      show("Status Firebase: Gagal Sinkron!", "#c0392b", false);
-    });
+  let janji;
+  if (changedId) {
+    const a = assets.find(x => x && x.id === changedId);
+    if (!a) return;
+    janji = firebase.database().ref("peta_aset/" + changedId).set(bersih(a));
+  } else {
+    const updates = {};
+    assets.forEach(a => { if (a && a.id) updates[a.id] = bersih(a); });
+    janji = firebase.database().ref("peta_aset").update(updates);
   }
-}
 
+  janji.then(() => {
+    console.log("Data berhasil disinkronkan ke Firebase!");
+    show("Status Firebase: Tersinkron (Online)", "#27ae60", true);
+  }).catch(err => {
+    console.log("Gagal sync:", err);
+    show("Status Firebase: Gagal Sinkron!", "#c0392b", false);
+  });
+}
 // Mendengarkan perubahan data dari Firebase secara real-time
         firebase.database().ref("peta_aset").on('value', (snapshot) => {
             const dataFromServer = snapshot.val();
